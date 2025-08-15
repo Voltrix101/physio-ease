@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,7 +19,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { BookingSuccess } from './BookingSuccess';
-import { ArrowLeft, ArrowRight, Loader2, UploadCloud } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -30,7 +30,7 @@ const formSchema = z.object({
   paymentProofText: z.string().optional(),
   paymentProofFile: z.any().optional(),
 }).refine(data => {
-    if (data.paymentProofType === 'text') return !!data.paymentProofText;
+    if (data.paymentProofType === 'text') return !!data.paymentProofText && data.paymentProofText.length > 0;
     if (data.paymentProofType === 'image') return !!data.paymentProofFile?.[0];
     return false;
 }, { message: 'Payment proof is required', path: ['paymentProofFile']});
@@ -40,13 +40,12 @@ const timeSlots = ['09:00 AM', '10:00 AM', '11:00 AM', '01:00 PM', '02:00 PM', '
 
 export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   const [step, setStep] = useState(1);
-  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const defaultTreatmentId = searchParams.get('treatment') || undefined;
 
   const initialState: State = { message: null, errors: {}, success: false };
-  const [state, formAction] = useActionState(createAppointment, initialState);
+  const [state, formAction, isPending] = useActionState(createAppointment, initialState);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,7 +56,6 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   });
 
   const selectedTreatmentId = form.watch('treatmentId');
-  const selectedTreatment = treatments.find(t => t.id === selectedTreatmentId);
 
   const nextStep = () => setStep(s => s + 1);
   const prevStep = () => setStep(s => s - 1);
@@ -71,32 +69,30 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
     });
   };
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('treatmentId', data.treatmentId);
-      formData.append('date', data.date.toISOString());
-      formData.append('time', data.time);
-      
-      let proof = '';
-      if (data.paymentProofType === 'text' && data.paymentProofText) {
-        proof = data.paymentProofText;
-      } else if (data.paymentProofType === 'image' && data.paymentProofFile?.[0]) {
-        try {
-          proof = await readFileAsDataURL(data.paymentProofFile[0]);
-        } catch (error) {
-          toast({
-              variant: "destructive",
-              title: "File Error",
-              description: "Could not read the uploaded file. Please try again.",
-          });
-          return;
-        }
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('treatmentId', data.treatmentId);
+    formData.append('date', data.date.toISOString());
+    formData.append('time', data.time);
+    
+    let proof = '';
+    if (data.paymentProofType === 'text' && data.paymentProofText) {
+      proof = data.paymentProofText;
+    } else if (data.paymentProofType === 'image' && data.paymentProofFile?.[0]) {
+      try {
+        proof = await readFileAsDataURL(data.paymentProofFile[0]);
+      } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "File Error",
+            description: "Could not read the uploaded file. Please try again.",
+        });
+        return;
       }
-      formData.append('paymentProof', proof);
-      formAction(formData);
-    });
+    }
+    formData.append('paymentProof', proof);
+    formAction(formData);
   };
 
   if (state.success) {
