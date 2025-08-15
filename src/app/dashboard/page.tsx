@@ -1,8 +1,32 @@
+
+'use client';
+
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { DashboardClient } from '@/components/dashboard/DashboardClient';
 import { mockAppointments, mockTreatments } from '@/lib/data';
+import { Loader2 } from 'lucide-react';
 
 export default function DashboardPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/admin/login');
+    }
+  }, [user, loading, router]);
+  
+  if (loading || !user) {
+    return (
+        <div className="flex h-screen w-full items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+    );
+  }
+  
   // In a real app, these would be fetched from Firestore based on the logged-in doctor.
   const appointments = mockAppointments;
   const treatments = mockTreatments;
