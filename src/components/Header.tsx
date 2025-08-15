@@ -7,7 +7,7 @@ import { Stethoscope, LogOut, Menu } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 
@@ -53,9 +53,13 @@ export function Header() {
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Menu className="h-6 w-6" />
+                <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="bg-[#2e4a3f] text-white border-l-0">
+                <SheetHeader>
+                  <SheetTitle className="text-white font-headline text-2xl tracking-wide text-left">Menu</SheetTitle>
+                </SheetHeader>
                 <nav className="flex flex-col gap-6 text-lg mt-8">
                   <SheetClose asChild><NavLinks /></SheetClose>
                   <Button onClick={handleBookAppointmentClick} className="bg-[#e0a96d] text-black px-4 py-2 rounded-lg hover:bg-[#d18f50] hover:scale-105 transform transition mt-4">
