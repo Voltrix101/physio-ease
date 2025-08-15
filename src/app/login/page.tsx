@@ -111,13 +111,13 @@ export default function LoginPage() {
 
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-1 flex items-center justify-center bg-secondary/50 p-4">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>{isSignUp ? 'Create Account' : 'Welcome Back'}</CardTitle>
-            <CardDescription>{isSignUp ? 'Enter your details to get started.' : 'Log in to continue to the clinic.'}</CardDescription>
+        <Card className="w-full max-w-sm shadow-xl">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-headline text-primary">{isSignUp ? 'Create an Account' : 'Welcome Back'}</CardTitle>
+            <CardDescription>{isSignUp ? 'Enter your details to get started.' : 'Log in to continue to your appointment.'}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleEmailPasswordSubmit} className="space-y-4">
@@ -135,7 +135,7 @@ export default function LoginPage() {
                   <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
                 </div>
               )}
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={loading}>
                 {loading ? <Loader2 className="animate-spin" /> : (isSignUp ? 'Sign Up' : 'Login')}
               </Button>
             </form>
@@ -145,17 +145,17 @@ export default function LoginPage() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                <span className="bg-card px-2 text-muted-foreground">Or</span>
               </div>
             </div>
             
             <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
-                {loading ? <Loader2 className="animate-spin" /> : <><GoogleIcon className="mr-2 h-5 w-5" /> Google</>}
+                {loading ? <Loader2 className="animate-spin" /> : <><GoogleIcon className="mr-2 h-5 w-5" /> Continue with Google</>}
             </Button>
 
             <div className="mt-4 text-center text-sm">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}
-              <Button variant="link" onClick={() => setIsSignUp(!isSignUp)} className="p-1">
+              <Button variant="link" onClick={() => setIsSignUp(!isSignUp)} className="p-1 text-accent">
                 {isSignUp ? 'Login' : 'Sign Up'}
               </Button>
             </div>
@@ -165,3 +165,4 @@ export default function LoginPage() {
     </div>
   );
 }
+
