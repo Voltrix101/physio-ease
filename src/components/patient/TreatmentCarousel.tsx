@@ -15,12 +15,12 @@ export function TreatmentCarousel({ treatments }: TreatmentCarouselProps) {
         align: "start",
         loop: true,
       }}
-      className="w-full"
+      className="w-full max-w-6xl mx-auto"
     >
       <CarouselContent>
         {treatments.map((treatment) => (
           <CarouselItem key={treatment.id} className="md:basis-1/2 lg:basis-1/3">
-            <div className="p-1">
+            <div className="p-2">
               <TreatmentCard treatment={treatment} />
             </div>
           </CarouselItem>

@@ -1,42 +1,91 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/Header';
 import { TreatmentCarousel } from '@/components/patient/TreatmentCarousel';
-import { mockTreatments } from '@/lib/data';
+import { mockServices } from '@/lib/data';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Check } from 'lucide-react';
 
 export default function Home() {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-secondary/50">
-          <div className="container px-4 md:px-6 text-center">
-            <div className="flex flex-col items-center space-y-4">
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none font-headline">
-                Revitalize Your Body, Restore Your Life
+        <section className="w-full bg-primary/5">
+          <div className="container grid md:grid-cols-2 gap-8 items-center py-12 md:py-24">
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary tracking-tight">
+                Dr. Amiya Ballav Roy
               </h1>
-              <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                Expert physiotherapy at your fingertips. Book your appointment today and take the first step towards a pain-free life.
+              <p className="font-semibold text-lg text-primary/90">
+                CDNT (Dry Needling), CKTP (Taping), CCTS (Dry Cupping) – PHYSIOTHERAPIST
               </p>
-              <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md transition-transform hover:scale-105">
+              <p className="text-muted-foreground">
+                Welcome to the Pain Manage Clinic, where we are dedicated to providing expert physiotherapy and rehabilitation services. Dr. Amiya specializes in advanced techniques to help you recover from injuries, manage pain, and restore your quality of life.
+              </p>
+              <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg transition-transform hover:scale-105">
                 <Link href="/book">Book an Appointment</Link>
               </Button>
+            </div>
+            <div className="relative h-80 md:h-96 rounded-lg overflow-hidden shadow-2xl">
+                <Image
+                    src="https://placehold.co/600x600.png"
+                    alt="Dr. Amiya Ballav Roy"
+                    layout="fill"
+                    objectFit="cover"
+                    className="object-top"
+                    data-ai-hint="male doctor portrait"
+                />
             </div>
           </div>
         </section>
         
-        <section id="treatments" className="w-full py-12 md:py-24">
+        <section id="services" className="w-full py-12 md:py-24 bg-secondary">
           <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-bold tracking-tighter text-center font-headline mb-12">Our Treatments</h2>
-            <TreatmentCarousel treatments={mockTreatments} />
+            <h2 className="text-3xl font-bold tracking-tighter text-center mb-12">Our Services</h2>
+            <TreatmentCarousel treatments={mockServices} />
           </div>
         </section>
+
+        <section id="testimonials" className="w-full py-12 md:py-24">
+            <div className="container px-4 md:px-6">
+                 <h2 className="text-3xl font-bold tracking-tighter text-center mb-12">Patient Testimonials</h2>
+                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {/* Placeholder for testimonials */}
+                    {[1,2,3].map(i => (
+                        <Card key={i}>
+                            <CardHeader>
+                                <CardTitle>Patient {i}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground">"A wonderful experience. Dr. Amiya is very knowledgeable and caring."</p>
+                            </CardContent>
+                        </Card>
+                    ))}
+                 </div>
+            </div>
+        </section>
+
+        <section id="clinic-details" className="w-full py-12 md:py-24 bg-secondary">
+            <div className="container text-center">
+                 <h2 className="text-3xl font-bold tracking-tighter mb-4">Visit Us</h2>
+                 <p className="text-muted-foreground max-w-md mx-auto">
+                    Pain Manage Clinic
+                    <br />
+                    123 Wellness Street, Kolkata, India
+                    <br />
+                    Phone: +91 12345 67890
+                 </p>
+            </div>
+        </section>
+
       </main>
-      <footer className="bg-card py-6 border-t">
-        <div className="container text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} PhysioEase. All rights reserved.
+      <footer className="bg-primary text-primary-foreground py-6 border-t">
+        <div className="container text-center text-sm">
+          © {new Date().getFullYear()} Pain Manage Clinic. All rights reserved.
         </div>
       </footer>
-    </>
+    </div>
   );
 }

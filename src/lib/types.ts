@@ -4,10 +4,26 @@ export interface Treatment {
   id: string;
   name: string;
   description: string;
-  price: number;
+  price: number; // in INR
   duration: number; // in minutes
   imageUrl: string;
   dataAiHint?: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  price: string; // Formatted INR string
+  imageUrl: string;
+  affiliateUrl: string;
+  dataAiHint?: string;
+}
+
+export interface Video {
+    id: string;
+    title: string;
+    description: string;
+    youtubeId: string;
 }
 
 export type AppointmentStatus = 'pending' | 'confirmed' | 'rejected' | 'completed';

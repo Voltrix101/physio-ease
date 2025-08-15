@@ -8,16 +8,17 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           <Stethoscope className="h-6 w-6 text-primary" />
-          <span className="font-headline">PhysioEase</span>
+          <span className="font-semibold">Pain Manage Clinic</span>
         </Link>
-        <nav className="flex items-center gap-2">
-           <Button asChild variant="outline" className="hidden sm:flex">
-            <Link href="/book">Book Now</Link>
-          </Button>
-          <Button asChild variant="ghost">
-            <Link href="/dashboard">Doctor Area</Link>
-          </Button>
+        <nav className="hidden md:flex items-center gap-4">
+           <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">Home</Link>
+           <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">About</Link>
+           <Link href="/products" className="text-sm font-medium hover:text-primary transition-colors">Products</Link>
+           <Link href="/videos" className="text-sm font-medium hover:text-primary transition-colors">Videos</Link>
         </nav>
+        <Button asChild variant="default" className="bg-primary hover:bg-primary/90">
+            <Link href="/book">Book Now</Link>
+        </Button>
       </div>
     </header>
   );

@@ -22,9 +22,9 @@ import { ArrowLeft, ArrowRight, Loader2, UploadCloud } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-  treatmentId: z.string(),
-  date: z.date(),
-  time: z.string(),
+  treatmentId: z.string({ required_error: 'Please select a service.' }),
+  date: z.date({ required_error: 'Please select a date.' }),
+  time: z.string({ required_error: 'Please select a time.' }),
   paymentProofType: z.enum(['text', 'image']),
   paymentProofText: z.string().optional(),
   paymentProofFile: z.any().optional(),
@@ -80,9 +80,9 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
     let proof = '';
     if (data.paymentProofType === 'text' && data.paymentProofText) {
       proof = data.paymentProofText;
-    } else if (data.paymentProofType === 'image' && data.paymentProofFile) {
+    } else if (data.paymentProofType === 'image' && data.paymentProofFile?.[0]) {
       try {
-        proof = await readFileAsDataURL(data.paymentProofFile);
+        proof = await readFileAsDataURL(data.paymentProofFile[0]);
       } catch (error) {
         toast({
             variant: "destructive",
@@ -109,17 +109,18 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {step === 1 && (
           <div className="space-y-4 animate-in fade-in-0 duration-500">
-            <h3 className="text-lg font-medium">Step 1: Choose Your Treatment</h3>
+            <h3 className="text-lg font-medium">Step 1: Choose Your Service</h3>
             <Controller
               control={form.control}
               name="treatmentId"
               render={({ field }) => (
                 <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {treatments.map((treatment) => (
-                    <Label key={treatment.id} htmlFor={treatment.id} className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer">
+                    <Label key={treatment.id} htmlFor={treatment.id} className="flex flex-col items-start justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer">
                       <RadioGroupItem value={treatment.id} id={treatment.id} className="sr-only" />
-                      <span className="font-semibold">{treatment.name}</span>
-                      <span className="text-sm text-muted-foreground">${treatment.price} - {treatment.duration} mins</span>
+                      <span className="font-semibold text-lg">{treatment.name}</span>
+                      <span className="text-sm text-muted-foreground mt-2">{treatment.description}</span>
+                      <span className="font-bold text-primary mt-4">₹{treatment.price} - {treatment.duration} mins</span>
                     </Label>
                   ))}
                 </RadioGroup>

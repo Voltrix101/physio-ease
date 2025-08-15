@@ -1,52 +1,99 @@
-import type { Treatment, Appointment } from './types';
+import type { Treatment, Appointment, Product, Video } from './types';
 
-export const mockTreatments: Treatment[] = [
+export const mockServices: Treatment[] = [
   {
     id: '1',
-    name: 'Deep Tissue Massage',
-    description: 'An intensive massage that focuses on deeper layers of muscle tissue to release chronic tension.',
-    price: 80,
-    duration: 60,
+    name: 'Dry Needling (CDNT)',
+    description: 'A skilled intervention that uses a thin filiform needle to penetrate the skin and stimulate underlying myofascial trigger points.',
+    price: 1500,
+    duration: 45,
     imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'massage therapy'
+    dataAiHint: 'dry needling therapy'
   },
   {
     id: '2',
-    name: 'Sports Injury Rehab',
-    description: 'Specialized program to help athletes recover from injuries and improve performance.',
-    price: 120,
-    duration: 90,
+    name: 'Kinesiology Taping (CKTP)',
+    description: 'Application of a special elastic tape to support muscles, reduce pain and swelling, and improve performance.',
+    price: 800,
+    duration: 30,
     imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'sports injury'
+    dataAiHint: 'kinesiology tape'
   },
   {
     id: '3',
-    name: 'Post-operative Care',
-    description: 'Gentle, guided exercises and therapies to restore mobility and function after surgery.',
-    price: 100,
-    duration: 60,
+    name: 'Dry Cupping (CCTS)',
+    description: 'An ancient form of alternative medicine in which a therapist puts special cups on your skin for a few minutes to create suction.',
+    price: 1200,
+    duration: 40,
     imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'physical therapy'
+    dataAiHint: 'cupping therapy'
   },
   {
     id: '4',
-    name: 'Acupuncture Session',
-    description: 'Traditional technique using fine needles to relieve pain and promote natural healing.',
-    price: 70,
-    duration: 45,
-    imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'acupuncture needles'
-  },
-   {
-    id: '5',
-    name: 'Joint Mobilization',
-    description: 'Skilled manual therapy techniques to improve joint movement and reduce stiffness.',
-    price: 90,
+    name: 'General Physiotherapy',
+    description: 'Comprehensive assessment and treatment for a wide range of musculoskeletal issues.',
+    price: 1000,
     duration: 60,
     imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'joint pain'
+    dataAiHint: 'physiotherapy exercise'
   },
 ];
+
+export const mockProducts: Product[] = [
+    {
+        id: 'prod-1',
+        name: 'Foam Roller',
+        price: '1200',
+        imageUrl: 'https://placehold.co/300x300.png',
+        affiliateUrl: '#',
+        dataAiHint: 'foam roller',
+    },
+    {
+        id: 'prod-2',
+        name: 'Resistance Bands Set',
+        price: '999',
+        imageUrl: 'https://placehold.co/300x300.png',
+        affiliateUrl: '#',
+        dataAiHint: 'resistance bands',
+    },
+    {
+        id: 'prod-3',
+        name: 'Kinesiology Tape Roll',
+        price: '650',
+        imageUrl: 'https://placehold.co/300x300.png',
+        affiliateUrl: '#',
+        dataAiHint: 'kinesiology tape',
+    },
+    {
+        id: 'prod-4',
+        name: 'Cold Therapy Pack',
+        price: '500',
+        imageUrl: 'https://placehold.co/300x300.png',
+        affiliateUrl: '#',
+        dataAiHint: 'ice pack',
+    }
+];
+
+export const mockVideos: Video[] = [
+    {
+        id: 'vid-1',
+        title: '5 Stretches for Lower Back Pain',
+        description: 'Follow along with these simple yet effective stretches to alleviate lower back pain.',
+        youtubeId: 'z915K14nL8s', // Example video ID
+    },
+    {
+        id: 'vid-2',
+        title: 'Strengthening Exercises for Knee Injuries',
+        description: 'Learn how to safely strengthen the muscles around your knee to aid recovery.',
+        youtubeId: 'N4s4O2G3dY4', // Example video ID
+    },
+    {
+        id: 'vid-3',
+        title: 'Proper Foam Rolling Technique',
+        description: 'Dr. Amiya demonstrates the correct way to use a foam roller for muscle recovery.',
+        youtubeId: 'roll-video-id', // Placeholder
+    }
+]
 
 export const mockAppointments: Appointment[] = [
   {
@@ -61,45 +108,5 @@ export const mockAppointments: Appointment[] = [
       paymentConfirmationSuggested: true,
       reason: 'Transaction ID format appears valid and matches typical payment processor formats.'
     }
-  },
-  {
-    id: 'APT002',
-    patientName: 'Bob Williams',
-    treatmentName: 'Sports Injury Rehab',
-    date: new Date('2024-08-15T11:30:00'),
-    status: 'pending',
-    paymentReference: 'Screenshot_Payment.jpg',
-    createdAt: new Date('2024-08-02T09:05:00'),
-    paymentVerification: {
-      paymentConfirmationSuggested: false,
-      reason: 'The uploaded image is blurry and does not clearly show a transaction amount or recipient details.'
-    }
-  },
-  {
-    id: 'APT003',
-    patientName: 'Charlie Brown',
-    treatmentName: 'Post-operative Care',
-    date: new Date('2024-08-16T14:00:00'),
-    status: 'confirmed',
-    paymentReference: 'TXN789012',
-    createdAt: new Date('2024-08-03T18:00:00'),
-  },
-  {
-    id: 'APT004',
-    patientName: 'Diana Prince',
-    treatmentName: 'Acupuncture Session',
-    date: new Date('2024-08-17T09:00:00'),
-    status: 'completed',
-    paymentReference: 'TXN345678',
-    createdAt: new Date('2024-08-04T11:45:00'),
-  },
-  {
-    id: 'APT005',
-    patientName: 'Ethan Hunt',
-    treatmentName: 'Joint Mobilization',
-    date: new Date('2024-08-18T16:00:00'),
-    status: 'rejected',
-    paymentReference: 'Invalid ID',
-    createdAt: new Date('2024-08-05T13:10:00'),
   },
 ];

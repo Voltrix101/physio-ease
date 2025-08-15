@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import { GeistSans } from 'geist/font/sans';
 
 export const metadata: Metadata = {
-  title: 'PhysioEase',
-  description: 'Book your physiotherapy appointments with ease.',
+  title: 'Pain Manage Clinic',
+  description: 'Appointment & Physiotherapy Hub for Dr. Amiya Ballav Roy',
 };
 
 export default function RootLayout({
@@ -13,13 +14,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
+    <html lang="en" className={GeistSans.className} suppressHydrationWarning>
+       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased min-h-screen bg-background flex flex-col">
+      <body className="antialiased min-h-screen bg-background flex flex-col">
         {children}
         <Toaster />
       </body>
