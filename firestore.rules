@@ -4,13 +4,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // Helper function to check if the current user is an admin.
-    // It checks for the existence of a document in the 'admins' collection
-    // with the user's UID, and that the 'isAdmin' field is true.
     function isAdmin() {
       return exists(/databases/$(database)/documents/admins/$(request.auth.uid))
              && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
     }
-    
+
     // Rules for public-facing data (treatments, products, videos)
     match /treatments/{treatmentId} {
       allow read: if true;
@@ -27,18 +25,19 @@ service cloud.firestore {
 
     // Rules for the appointments collection
     match /appointments/{appointmentId} {
-      // Any authenticated user can create an appointment for themselves.
-      // We will add a rule to ensure they can only read their own appointments later if needed.
+      // Any authenticated user can create and read their own appointment.
       allow create: if request.auth != null;
-      
-      // Only admins can view, list, update, or delete any appointment.
-      allow read, write: if isAdmin();
+      allow read: if request.auth != null && 
+        (resource.data.userId == request.auth.uid || isAdmin());
+      // Only admins can update or delete any appointment.
+      allow update, delete: if isAdmin();
+      // Allow admins to list all appointments
+      allow list: if isAdmin();
     }
 
     // Admins collection should not be writable from the client-side for security.
-    // An admin can read their own document to verify their status.
     match /admins/{userId} {
-      allow read: if isAdmin() && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if false; // Disallow client-side writes completely
     }
   }
