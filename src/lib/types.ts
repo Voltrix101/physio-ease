@@ -1,3 +1,4 @@
+
 'use server';
 
 import type { VerifyPaymentProofOutput } from "@/ai/flows/verify-payment-proof";
@@ -15,7 +16,7 @@ export interface Treatment {
 
 export interface Product {
   id: string;
-  name: string;
+  name:string;
   price: number; // in INR
   imageUrl: string;
   affiliateUrl: string;
@@ -34,6 +35,7 @@ export type AppointmentStatus = 'pending' | 'confirmed' | 'rejected' | 'complete
 export interface Appointment {
   id: string;
   patientName: string;
+  patientId: string; // ID of the authenticated user
   treatmentId: string;
   treatmentName: string;
   date: Date | Timestamp; // Allow both for client-side and Firestore

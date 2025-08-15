@@ -1,3 +1,4 @@
+
 'use server';
 
 import { z } from 'zod';
@@ -6,6 +7,7 @@ import type { VerifyPaymentProofOutput } from '@/ai/flows/verify-payment-proof';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, getDoc, doc } from 'firebase/firestore';
 import type { Treatment } from '@/lib/types';
+import { auth } from '@/lib/firebase';
 
 
 const FormSchema = z.object({
@@ -45,6 +47,14 @@ export async function createAppointment(prevState: State, formData: FormData): P
             success: false,
         };
     }
+    
+    // Check for authenticated user
+    if (!auth.currentUser) {
+        return {
+            message: 'You must be logged in to book an appointment.',
+            success: false
+        };
+    }
 
     const { name, treatmentId, date, time, paymentProof } = validatedFields.data;
 
@@ -65,6 +75,7 @@ export async function createAppointment(prevState: State, formData: FormData): P
         
         await addDoc(collection(db, 'appointments'), {
             patientName: name,
+            patientId: auth.currentUser.uid, // Add user's UID
             treatmentId: treatmentId,
             treatmentName: selectedTreatment?.name || 'Unknown Treatment',
             date: new Date(date),
