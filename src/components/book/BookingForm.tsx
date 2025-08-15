@@ -48,7 +48,6 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   
-  // Memoize the search param to avoid re-reading from the hook on every render
   const defaultTreatmentId = useMemo(() => searchParams.get('treatment') || undefined, [searchParams]);
   
   const [isPending, startTransition] = useTransition();
@@ -93,7 +92,7 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
     formData.append('treatmentId', data.treatmentId);
     formData.append('date', data.date.toISOString());
     formData.append('time', data.time);
-    formData.append('patientId', user.uid);
+    formData.append('patientId', user.uid); // ** THE FIX IS HERE **
     
     let proof = '';
     if (data.paymentProofType === 'text' && data.paymentProofText) {
