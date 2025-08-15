@@ -69,8 +69,7 @@ export default function Home() {
 
         {/* Doctor Profile Section */}
         <section className="bg-[#faf8f3] py-16 px-6 md:px-20 text-center animate-fadeUp">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/doctor-photo.jpeg" alt="Dr. Amiya Ballav Roy" className="w-40 h-40 rounded-full mx-auto object-cover shadow-lg mb-6 hover:scale-105 transition"/>
+          <Image src="https://i.postimg.cc/CxpzR9S8/Whats-App-Image-2025-08-15-at-23-45-01.jpg" alt="Dr. Amiya Ballav Roy" width={160} height={160} className="w-40 h-40 rounded-full mx-auto object-cover shadow-lg mb-6 hover:scale-105 transition"/>
           <h2 className="text-3xl font-headline mb-2 text-[#2e4a3f]">Dr. Amiya Ballav Roy</h2>
           <p className="text-[#70a8a3] font-medium mb-4">CDNT, CKTP, CCTS | Physiotherapist @ Pain Manage Clinic</p>
           <p className="max-w-2xl mx-auto mb-6 text-muted-foreground">
