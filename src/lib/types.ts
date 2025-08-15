@@ -1,3 +1,5 @@
+'use server';
+
 import type { VerifyPaymentProofOutput } from "@/ai/flows/verify-payment-proof";
 import type { Timestamp } from "firebase/firestore";
 
@@ -14,7 +16,7 @@ export interface Treatment {
 export interface Product {
   id: string;
   name: string;
-  price: string; // Formatted INR string
+  price: number; // in INR
   imageUrl: string;
   affiliateUrl: string;
   dataAiHint?: string;

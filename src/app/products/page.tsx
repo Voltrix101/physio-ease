@@ -1,13 +1,22 @@
-
 import { Header } from "@/components/Header";
-import { mockProducts } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import type { Product } from "@/lib/types";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 
-export default function ProductsPage() {
+async function getProducts(): Promise<Product[]> {
+    const productsCol = collection(db, 'products');
+    const q = query(productsCol, orderBy('name'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+}
+
+export default async function ProductsPage() {
+    const products = await getProducts();
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
@@ -27,7 +36,7 @@ export default function ProductsPage() {
                 <section className="py-12 md:py-16">
                     <div className="container mx-auto px-4 md:px-6">
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                            {mockProducts.map(product => (
+                            {products.map(product => (
                                 <Card key={product.id} className="flex flex-col h-full overflow-hidden transition-shadow duration-300 hover:shadow-xl rounded-lg">
                                     <CardHeader className="p-0">
                                         <div className="relative h-56 w-full">

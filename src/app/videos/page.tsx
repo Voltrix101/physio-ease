@@ -1,9 +1,19 @@
 import { Header } from "@/components/Header";
-import { mockVideos } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import type { Video } from "@/lib/types";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 
-export default function VideosPage() {
+async function getVideos(): Promise<Video[]> {
+    const videosCol = collection(db, 'videos');
+    const q = query(videosCol, orderBy('title'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Video));
+}
+
+export default async function VideosPage() {
+    const videos = await getVideos();
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
@@ -17,7 +27,7 @@ export default function VideosPage() {
                     </div>
 
                     <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8">
-                        {mockVideos.map(video => (
+                        {videos.map(video => (
                             <Card key={video.id}>
                                 <CardHeader>
                                     <AspectRatio ratio={16 / 9}>
