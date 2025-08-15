@@ -2,40 +2,28 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Admin check function
+  
+    // Function to check for admin role
     function isAdmin() {
-      // Check if the user's UID exists in the 'admins' collection.
-      return exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      return exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    // Treatments can be read by anyone, but only written by admins.
-    match /treatments/{treatmentId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    // Products can be read by anyone, but only written by admins.
-    match /products/{productId} {
-      allow read: if true;
+    // Public collections (read-only for public, write for admin)
+    match /(treatments|products|videos)/{docId} {
+      allow get, list: if true;
       allow write: if isAdmin();
     }
     
-    // Videos can be read by anyone, but only written by admins.
-    match /videos/{videoId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
-    // Appointments can be created by any authenticated user.
-    // They can only be read or modified by an admin.
+    // Appointments
     match /appointments/{appointmentId} {
-      allow read, update, delete: if isAdmin();
-      allow create: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.patientId == request.auth.uid;
+      allow read, update, delete, list: if isAdmin();
     }
 
-    // The admins collection is restricted to admins only.
+    // Admins collection (only readable by admins to verify roles)
     match /admins/{userId} {
-      allow read, write: if isAdmin();
+      allow read: if isAdmin();
     }
   }
 }
