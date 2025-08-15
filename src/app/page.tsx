@@ -70,7 +70,7 @@ export default function Home() {
 
         {/* Doctor Profile Section */}
         <section className="bg-[#faf8f3] py-16 px-6 md:px-20 text-center animate-fadeUp">
-          <Image src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=1470&auto=format&fit=crop" alt="Dr. Amiya Ballav Roy" width={160} height={160} className="w-40 h-40 rounded-full mx-auto shadow-lg mb-6 hover:scale-105 transition object-cover"/>
+          <Image src="/doctor-photo.png" alt="Dr. Amiya Ballav Roy" width={160} height={160} className="w-40 h-40 rounded-full mx-auto shadow-lg mb-6 hover:scale-105 transition object-cover"/>
           <h2 className="text-3xl font-headline mb-2 text-[#2e4a3f]">Dr. Amiya Ballav Roy</h2>
           <p className="text-[#70a8a3] font-medium mb-4">CDNT, CKTP, CCTS | Physiotherapist @ Pain Manage Clinic</p>
           <p className="max-w-2xl mx-auto mb-6 text-muted-foreground">
