@@ -51,11 +51,12 @@ export default function Home() {
         {/* Hero Section */}
         <section className="relative h-[80vh] flex items-center justify-center text-center text-white animate-fadeIn">
           <Image
-            src="https://static.vecteezy.com/system/resources/thumbnails/053/279/107/small_2x/physiotherapy-session-with-focus-on-rehabilitation-photo.jpeg"
+            src="https://plus.unsplash.com/premium_photo-1663012948067-0478e4f9d9c6?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Physiotherapy session"
             layout="fill"
             objectFit="cover"
             className="absolute w-full h-full object-cover"
+            priority
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30"></div>
           <div className="relative z-10 max-w-2xl animate-riseUp">
