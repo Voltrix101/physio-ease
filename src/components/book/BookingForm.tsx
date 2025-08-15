@@ -92,7 +92,7 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
     formData.append('treatmentId', data.treatmentId);
     formData.append('date', data.date.toISOString());
     formData.append('time', data.time);
-    formData.append('patientId', user.uid); // ** THE FIX IS HERE **
+    formData.append('patientId', user.uid);
     
     let proof = '';
     if (data.paymentProofType === 'text' && data.paymentProofText) {
