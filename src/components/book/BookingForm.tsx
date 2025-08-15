@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useFormState } from 'react-dom';
 import { useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
@@ -39,7 +40,7 @@ const timeSlots = ['09:00 AM', '10:00 AM', '11:00 AM', '01:00 PM', '02:00 PM', '
 
 export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   const [step, setStep] = useState(1);
-  const [pending, setPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const defaultTreatmentId = searchParams.get('treatment') || undefined;
@@ -71,7 +72,6 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setPending(true);
     const formData = new FormData();
     formData.append('name', data.name);
     formData.append('treatmentId', data.treatmentId);
@@ -90,14 +90,14 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
             title: "File Error",
             description: "Could not read the uploaded file. Please try again.",
         });
-        setPending(false);
         return;
       }
     }
     formData.append('paymentProof', proof);
 
-    dispatch(formData);
-    setPending(false);
+    startTransition(() => {
+        dispatch(formData);
+    });
   };
 
   if (state.success) {
@@ -189,8 +189,8 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
             
             <div className="flex justify-between">
               <Button variant="outline" onClick={prevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-              <Button type="submit" disabled={pending}>
-                {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button type="submit" disabled={isPending}>
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Request Appointment
               </Button>
             </div>
