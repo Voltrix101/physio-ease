@@ -1,10 +1,10 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
-import { onAuthStateChanged, type User } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
+import type { User } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -16,8 +16,13 @@ export function useAuth() {
       setUser(user);
       if (user) {
         const adminDocRef = doc(db, 'admins', user.uid);
-        const adminDocSnap = await getDoc(adminDocRef);
-        setIsAdmin(adminDocSnap.exists() && adminDocSnap.data().isAdmin === true);
+        try {
+          const adminDocSnap = await getDoc(adminDocRef);
+          setIsAdmin(adminDocSnap.exists() && adminDocSnap.data().isAdmin === true);
+        } catch (error) {
+          console.error("Error checking admin status:", error);
+          setIsAdmin(false);
+        }
       } else {
         setIsAdmin(false);
       }
