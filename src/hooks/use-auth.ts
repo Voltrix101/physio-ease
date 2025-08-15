@@ -3,10 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-
-// IMPORTANT: Replace with the actual admin email
-const ADMIN_EMAIL = 'admin@physioease.com';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -14,9 +12,15 @@ export function useAuth() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
-      setIsAdmin(user?.email === ADMIN_EMAIL);
+      if (user) {
+        const adminDocRef = doc(db, 'admins', user.uid);
+        const adminDocSnap = await getDoc(adminDocRef);
+        setIsAdmin(adminDocSnap.exists() && adminDocSnap.data().isAdmin === true);
+      } else {
+        setIsAdmin(false);
+      }
       setLoading(false);
     });
 

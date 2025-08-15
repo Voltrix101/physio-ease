@@ -11,7 +11,8 @@ import {
   type User,
   type AuthError,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,9 +20,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { Header } from '@/components/Header';
-
-// IMPORTANT: Replace with the actual admin email
-const ADMIN_EMAIL = 'admin@physioease.com';
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 48 48" {...props}>
@@ -42,8 +40,10 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleAuthSuccess = (user: User) => {
-    if (user.email === ADMIN_EMAIL) {
+  const handleAuthSuccess = async (user: User) => {
+    const adminDocRef = doc(db, 'admins', user.uid);
+    const adminDocSnap = await getDoc(adminDocRef);
+    if (adminDocSnap.exists() && adminDocSnap.data().isAdmin) {
       router.push('/dashboard');
     } else {
       router.push('/book');
@@ -84,10 +84,10 @@ export default function LoginPage() {
     try {
       if (isSignUp) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        handleAuthSuccess(userCredential.user);
+        await handleAuthSuccess(userCredential.user);
       } else {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        handleAuthSuccess(userCredential.user);
+        await handleAuthSuccess(userCredential.user);
       }
     } catch (error) {
       handleError(error as AuthError);
@@ -101,7 +101,7 @@ export default function LoginPage() {
       const provider = new GoogleAuthProvider();
       try {
           const result = await signInWithPopup(auth, provider);
-          handleAuthSuccess(result.user);
+          await handleAuthSuccess(result.user);
       } catch (error) {
           handleError(error as AuthError);
       } finally {

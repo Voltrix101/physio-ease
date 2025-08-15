@@ -1,29 +1,58 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-  
-    // Function to check for admin role
+
+    // Helper function to check if the current user is an administrator.
+    // It checks for the existence of a document in the 'admins' collection
+    // with the user's UID and an 'isAdmin' flag set to true.
     function isAdmin() {
       return exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
              get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    // Public collections (read-only for public, write for admin)
-    match /(treatments|products|videos)/{docId} {
+    // By default, deny all reads and writes to all documents.
+    // This ensures that we must explicitly grant access to each collection.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Public collections:
+    // Anyone can read (get individual documents) and list (get the whole collection).
+    // Only administrators can create, update, or delete documents.
+    match /treatments/{docId} {
       allow get, list: if true;
       allow write: if isAdmin();
     }
-    
-    // Appointments
-    match /appointments/{appointmentId} {
-      allow create: if request.auth != null && request.resource.data.patientId == request.auth.uid;
-      allow read, update, delete, list: if isAdmin();
+    match /products/{docId} {
+      allow get, list: if true;
+      allow write: if isAdmin();
+    }
+    match /videos/{docId} {
+      allow get, list: if true;
+      allow write: if isAdmin();
     }
 
-    // Admins collection (only readable by admins to verify roles)
-    match /admins/{userId} {
-      allow read: if isAdmin();
+    // Appointments collection:
+    // Any authenticated user can create an appointment.
+    // Only an administrator can view the full list of appointments or update/delete them.
+    match /appointments/{docId} {
+      allow create: if request.auth != null;
+      allow read, update, delete, list: if isAdmin();
+    }
+    
+    // A user can read their own appointment, but this is not yet used in the app.
+    // match /appointments/{appointmentId} {
+    //   allow read: if isAdmin() || request.auth.uid == resource.data.patientId;
+    // }
+
+    // Admins collection:
+    // This collection is used to determine admin status. No one should be able
+    // to read or modify it directly through the client-side SDKs.
+    // Admin status should only be changed directly in the Firebase Console.
+    match /admins/{adminId} {
+      allow read, write: if false;
     }
   }
 }
