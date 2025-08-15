@@ -18,9 +18,11 @@ export function useAuth() {
         const adminDocRef = doc(db, 'admins', user.uid);
         try {
           const adminDocSnap = await getDoc(adminDocRef);
-          setIsAdmin(adminDocSnap.exists() && adminDocSnap.data().isAdmin === true);
+          // If document doesn't exist, user is not an admin
+          setIsAdmin(adminDocSnap.exists() && adminDocSnap.data()?.isAdmin === true);
         } catch (error) {
           console.error("Error checking admin status:", error);
+          // If there's an error (like permission denied), assume not admin
           setIsAdmin(false);
         }
       } else {

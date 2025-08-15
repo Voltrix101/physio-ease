@@ -1,15 +1,14 @@
 
 'use client';
 
-import { useState, useTransition, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useActionState } from 'react';
 import Link from 'next/link';
 
-import { createAppointment, type State } from '@/app/book/actions';
+import { createAppointment, type CreateAppointmentResult } from '@/lib/appointments';
 import type { Treatment } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,10 +49,8 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   
   const defaultTreatmentId = useMemo(() => searchParams.get('treatment') || undefined, [searchParams]);
   
-  const [isPending, startTransition] = useTransition();
-
-  const initialState: State = { message: null, errors: {}, success: false };
-  const [state, formAction] = useActionState(createAppointment, initialState);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<CreateAppointmentResult | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -87,12 +84,7 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
         return;
     }
     
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('treatmentId', data.treatmentId);
-    formData.append('date', data.date.toISOString());
-    formData.append('time', data.time);
-    formData.append('patientId', user.uid);
+    setIsSubmitting(true);
     
     let proof = '';
     if (data.paymentProofType === 'text' && data.paymentProofText) {
@@ -106,17 +98,47 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
             title: "File Error",
             description: "Could not read the uploaded file. Please try again.",
         });
+        setIsSubmitting(false);
         return;
       }
     }
-    formData.append('paymentProof', proof);
     
-    startTransition(() => {
-        formAction(formData);
-    });
+    try {
+      const result = await createAppointment({
+        name: data.name,
+        treatmentId: data.treatmentId,
+        date: data.date.toISOString(),
+        time: data.time,
+        paymentProof: proof,
+        userId: user.uid,
+      });
+      
+      setSubmitResult(result);
+      
+      if (result.success) {
+        toast({
+          title: "Success!",
+          description: result.message,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: result.message,
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  if (state.success) {
+  if (submitResult?.success) {
     return <BookingSuccess />;
   }
   
@@ -208,12 +230,12 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
                     <Input id="paymentProofText" {...form.register('paymentProofText')} placeholder="Enter UPI transaction ID" />
                 </div>
             )}
-             {form.formState.errors.paymentProofFile && <p className="text-sm text-destructive">{form.formState.errors.paymentProofFile.message}</p>}
+             {form.formState.errors.paymentProofFile && <p className="text-sm text-destructive">{String(form.formState.errors.paymentProofFile.message)}</p>}
             
             <div className="flex justify-between items-center">
               <Button type="button" variant="outline" onClick={prevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-              <Button type="submit" disabled={isPending || authLoading || !user} className="bg-accent text-accent-foreground hover:bg-accent/90">
-                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button type="submit" disabled={isSubmitting || authLoading || !user} className="bg-accent text-accent-foreground hover:bg-accent/90">
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Request Appointment
               </Button>
             </div>
@@ -225,7 +247,7 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
                     </AlertDescription>
                 </Alert>
             )}
-            {state.message && !state.success && <p className="text-sm text-destructive mt-2">{state.message}</p>}
+            {submitResult?.message && !submitResult.success && <p className="text-sm text-destructive mt-2">{submitResult.message}</p>}
           </div>
         )}
       </form>

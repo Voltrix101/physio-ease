@@ -70,6 +70,7 @@ export async function createAppointment(prevState: State, formData: FormData): P
         await addDoc(collection(db, 'appointments'), {
             patientName: name,
             patientId: patientId,
+            userId: patientId, // Add this field for Firestore rules
             treatmentId: treatmentId,
             treatmentName: selectedTreatment?.name || 'Unknown Treatment',
             date: new Date(date),

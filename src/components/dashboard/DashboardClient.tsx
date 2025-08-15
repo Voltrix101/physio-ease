@@ -20,7 +20,7 @@ export function DashboardClient({ appointments }: DashboardClientProps) {
   const activeTab = searchParams.get('tab') || 'appointments';
 
   const handleTabChange = (value: string) => {
-    // This uses the Next.js router to update the URL without a page reload.
+    // Use Next.js router to update the URL without a page reload
     router.push(`${pathname}?tab=${value}`, { scroll: false });
   };
 

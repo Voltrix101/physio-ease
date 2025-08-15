@@ -29,6 +29,11 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
+    // Always redirect to 172.16.0.2:9002
+    if (typeof window !== 'undefined' && window.location.hostname !== '172.16.0.2') {
+      window.location.href = 'http://172.16.0.2:9002';
+      return;
+    }
     async function fetchTreatments() {
         const fetchedTreatments = await getTreatments();
         setTreatments(fetchedTreatments);
