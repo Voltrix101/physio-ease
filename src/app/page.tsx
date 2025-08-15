@@ -3,11 +3,23 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/Header';
 import { TreatmentCarousel } from '@/components/patient/TreatmentCarousel';
-import { mockServices } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import type { Treatment } from '@/lib/types';
 
-export default function Home() {
+
+async function getTreatments(): Promise<Treatment[]> {
+    const treatmentsCol = collection(db, 'treatments');
+    const q = query(treatmentsCol, orderBy('name'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Treatment));
+}
+
+
+export default async function Home() {
+  const treatments = await getTreatments();
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -44,7 +56,7 @@ export default function Home() {
         <section id="services" className="w-full py-12 md:py-24 bg-secondary">
           <div className="container px-4 md:px-6">
             <h2 className="text-3xl font-bold tracking-tighter text-center mb-12">Our Services</h2>
-            <TreatmentCarousel treatments={mockServices} />
+            <TreatmentCarousel treatments={treatments} />
           </div>
         </section>
 

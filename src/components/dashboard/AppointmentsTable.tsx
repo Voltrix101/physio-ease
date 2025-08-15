@@ -25,12 +25,14 @@ function FormattedDate({ date }: { date: Date | Timestamp }) {
   const [formattedDate, setFormattedDate] = useState('');
 
   useEffect(() => {
+    // Should run only on the client
     const jsDate = date instanceof Date ? date : date.toDate();
-    setFormattedDate(jsDate.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }));
+    setFormattedDate(new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(jsDate));
   }, [date]);
 
   return <>{formattedDate}</>;
 }
+
 
 export function AppointmentsTable({ appointments, onUpdate }: AppointmentsTableProps) {
   

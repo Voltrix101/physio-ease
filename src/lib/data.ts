@@ -1,44 +1,5 @@
 import type { Treatment, Appointment, Product, Video } from './types';
 
-export const mockServices: Treatment[] = [
-  {
-    id: '1',
-    name: 'Dry Needling (CDNT)',
-    description: 'A skilled intervention that uses a thin filiform needle to penetrate the skin and stimulate underlying myofascial trigger points.',
-    price: 1500,
-    duration: 45,
-    imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'dry needling therapy'
-  },
-  {
-    id: '2',
-    name: 'Kinesiology Taping (CKTP)',
-    description: 'Application of a special elastic tape to support muscles, reduce pain and swelling, and improve performance.',
-    price: 800,
-    duration: 30,
-    imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'kinesiology tape'
-  },
-  {
-    id: '3',
-    name: 'Dry Cupping (CCTS)',
-    description: 'An ancient form of alternative medicine in which a therapist puts special cups on your skin for a few minutes to create suction.',
-    price: 1200,
-    duration: 40,
-    imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'cupping therapy'
-  },
-  {
-    id: '4',
-    name: 'General Physiotherapy',
-    description: 'Comprehensive assessment and treatment for a wide range of musculoskeletal issues.',
-    price: 1000,
-    duration: 60,
-    imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'physiotherapy exercise'
-  },
-];
-
 export const mockProducts: Product[] = [
     {
         id: 'prod-1',
@@ -102,7 +63,7 @@ export const mockAppointments: Appointment[] = [
     treatmentName: 'Deep Tissue Massage',
     date: new Date('2024-08-15T10:00:00'),
     status: 'pending',
-    paymentReference: 'TXN123456',
+    paymentProof: 'TXN123456',
     createdAt: new Date('2024-08-01T14:20:00'),
     paymentVerification: {
       paymentConfirmationSuggested: true,
@@ -110,3 +71,5 @@ export const mockAppointments: Appointment[] = [
     }
   },
 ];
+
+// mockServices has been removed as it is now fetched from Firestore.

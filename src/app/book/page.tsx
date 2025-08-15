@@ -1,9 +1,20 @@
 import { Header } from "@/components/Header";
 import { BookingForm } from "@/components/book/BookingForm";
-import { mockServices } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Treatment } from "@/lib/types";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 
-export default function BookAppointmentPage() {
+async function getTreatments(): Promise<Treatment[]> {
+    const treatmentsCol = collection(db, 'treatments');
+    const q = query(treatmentsCol, orderBy('name'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Treatment));
+}
+
+
+export default async function BookAppointmentPage() {
+    const treatments = await getTreatments();
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
@@ -15,7 +26,7 @@ export default function BookAppointmentPage() {
                             <CardDescription>Complete the steps below to schedule your session with Dr. Amiya.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <BookingForm treatments={mockServices} />
+                            <BookingForm treatments={treatments} />
                         </CardContent>
                     </Card>
                 </div>

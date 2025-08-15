@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Header } from '@/components/Header';
 import { DashboardClient } from '@/components/dashboard/DashboardClient';
-import { mockTreatments } from '@/lib/data';
 import { Loader2 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
@@ -64,9 +63,6 @@ export default function DashboardPage() {
         </div>
     );
   }
-  
-  // In a real app, these would be fetched from Firestore based on the logged-in doctor.
-  const treatments = mockTreatments;
 
   return (
     <>
@@ -76,7 +72,7 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold tracking-tight font-headline">Doctor Dashboard</h1>
           <p className="text-muted-foreground">Manage your appointments, treatments, and patients.</p>
         </div>
-        <DashboardClient appointments={appointments} treatments={treatments} />
+        <DashboardClient appointments={appointments} />
       </main>
     </>
   );

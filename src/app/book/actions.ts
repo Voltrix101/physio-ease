@@ -4,8 +4,9 @@ import { z } from 'zod';
 import { verifyPaymentProof } from '@/ai/flows/verify-payment-proof';
 import type { VerifyPaymentProofOutput } from '@/ai/flows/verify-payment-proof';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { mockServices } from '@/lib/data';
+import { collection, addDoc, serverTimestamp, getDoc, doc } from 'firebase/firestore';
+import type { Treatment } from '@/lib/types';
+
 
 const FormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -28,7 +29,7 @@ export type State = {
     data?: VerifyPaymentProofOutput;
 };
 
-export async function createAppointment(prevState: State, formData: FormData) {
+export async function createAppointment(prevState: State, formData: FormData): Promise<State> {
     const validatedFields = FormSchema.safeParse({
         name: formData.get('name'),
         treatmentId: formData.get('treatmentId'),
@@ -50,7 +51,17 @@ export async function createAppointment(prevState: State, formData: FormData) {
     try {
         const verificationResult = await verifyPaymentProof({ paymentProof });
         
-        const selectedTreatment = mockServices.find(t => t.id === treatmentId);
+        const treatmentRef = doc(db, 'treatments', treatmentId);
+        const treatmentSnap = await getDoc(treatmentRef);
+
+        if (!treatmentSnap.exists()) {
+             return {
+                message: `Failed to create appointment: Selected treatment does not exist.`,
+                success: false,
+            };
+        }
+        
+        const selectedTreatment = treatmentSnap.data() as Treatment;
         
         await addDoc(collection(db, 'appointments'), {
             patientName: name,

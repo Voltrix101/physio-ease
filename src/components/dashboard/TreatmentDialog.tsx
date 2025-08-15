@@ -17,6 +17,7 @@ const treatmentSchema = z.object({
   price: z.coerce.number().min(0, 'Price cannot be negative'),
   duration: z.coerce.number().min(1, 'Duration must be at least 1 minute'),
   imageUrl: z.string().url('Must be a valid URL'),
+  dataAiHint: z.string().optional(),
 });
 
 type TreatmentFormData = z.infer<typeof treatmentSchema>;
@@ -24,7 +25,7 @@ type TreatmentFormData = z.infer<typeof treatmentSchema>;
 interface TreatmentDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  onSave: (treatment: Treatment) => void;
+  onSave: (treatment: Omit<Treatment, 'id'>) => void;
   treatment?: Treatment;
 }
 
@@ -34,26 +35,24 @@ export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: Treatm
   });
 
   useEffect(() => {
-    if (treatment) {
-      reset(treatment);
-    } else {
-      reset({
-        name: '',
-        description: '',
-        price: 0,
-        duration: 60,
-        imageUrl: 'https://placehold.co/600x400.png',
-      });
+    if (isOpen) {
+        if (treatment) {
+          reset(treatment);
+        } else {
+          reset({
+            name: '',
+            description: '',
+            price: 0,
+            duration: 60,
+            imageUrl: 'https://placehold.co/600x400.png',
+            dataAiHint: '',
+          });
+        }
     }
   }, [treatment, reset, isOpen]);
 
   const onSubmit = (data: TreatmentFormData) => {
-    onSave({
-      ...data,
-      id: treatment?.id || '', // ID is handled by parent
-      dataAiHint: treatment?.dataAiHint,
-    });
-    setIsOpen(false);
+    onSave(data);
   };
 
   return (
@@ -78,7 +77,7 @@ export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: Treatm
           </div>
           <div className="grid grid-cols-2 gap-4">
              <div className="grid gap-2">
-                <Label htmlFor="price">Price ($)</Label>
+                <Label htmlFor="price">Price (₹)</Label>
                 <Input id="price" type="number" {...register('price')} />
                 {errors.price && <p className="text-red-500 text-xs">{errors.price.message}</p>}
              </div>
@@ -92,6 +91,10 @@ export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: Treatm
             <Label htmlFor="imageUrl">Image URL</Label>
             <Input id="imageUrl" {...register('imageUrl')} />
             {errors.imageUrl && <p className="text-red-500 text-xs">{errors.imageUrl.message}</p>}
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="dataAiHint">AI Image Hint</Label>
+            <Input id="dataAiHint" {...register('dataAiHint')} placeholder="e.g. physiotherapy exercise" />
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>

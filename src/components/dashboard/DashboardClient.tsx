@@ -3,15 +3,14 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppointmentsList } from "./AppointmentsList";
 import { TreatmentsList } from "./TreatmentsList";
-import type { Appointment, Treatment } from "@/lib/types";
+import type { Appointment } from "@/lib/types";
 import { Calendar, ListOrdered } from "lucide-react";
 
 interface DashboardClientProps {
   appointments: Appointment[];
-  treatments: Treatment[];
 }
 
-export function DashboardClient({ appointments, treatments }: DashboardClientProps) {
+export function DashboardClient({ appointments }: DashboardClientProps) {
   return (
     <Tabs defaultValue="appointments" className="w-full">
       <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
@@ -28,7 +27,7 @@ export function DashboardClient({ appointments, treatments }: DashboardClientPro
         <AppointmentsList initialAppointments={appointments} />
       </TabsContent>
       <TabsContent value="treatments" className="mt-6">
-        <TreatmentsList initialTreatments={treatments} />
+        <TreatmentsList />
       </TabsContent>
     </Tabs>
   );
