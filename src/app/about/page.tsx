@@ -34,7 +34,7 @@ export default function AboutPage() {
             </div>
             <div className="relative h-[500px] rounded-lg overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500">
                 <Image
-                    src="/doctor-photo.png"
+                    src="/doctor-photo.jpeg"
                     alt="Dr. Amiya Ballav Roy"
                     fill
                     className="object-cover object-center"
