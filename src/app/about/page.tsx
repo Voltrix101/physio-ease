@@ -23,7 +23,7 @@ export default function AboutPage() {
                 </p>
                 <h2 className="text-3xl font-headline text-primary pt-4">Our Philosophy</h2>
                 <p className="text-muted-foreground">
-                    At PhysioEase Clinic, we believe in a holistic approach to patient care. We don&apos;t just treat the symptoms; we work to identify and address the root cause of your condition. Our goal is to empower you with the knowledge and tools you need to live a pain-free, active life.
+                    At PhysioEase Clinic, we believe in a holistic approach to patient care. We don't just treat the symptoms; we work to identify and address the root cause of your condition. Our goal is to empower you with the knowledge and tools you need to live a pain-free, active life.
                 </p>
                  <h2 className="text-3xl font-headline text-primary pt-4">Certifications</h2>
                 <ul className="list-disc list-inside space-y-2 text-muted-foreground">
@@ -34,12 +34,11 @@ export default function AboutPage() {
             </div>
             <div className="relative h-[500px] rounded-lg overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500">
                 <Image
-                    src="https://placehold.co/600x800.png"
+                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=1470&auto=format&fit=crop"
                     alt="Dr. Amiya Ballav Roy"
                     layout="fill"
                     objectFit="cover"
                     className="object-center"
-                    data-ai-hint="male doctor professional"
                 />
             </div>
           </div>
