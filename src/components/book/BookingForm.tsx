@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,7 +42,9 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   const [step, setStep] = useState(1);
   const { toast } = useToast();
   const searchParams = useSearchParams();
-  const defaultTreatmentId = searchParams.get('treatment') || undefined;
+  
+  // Memoize the search param to avoid re-reading from the hook on every render
+  const defaultTreatmentId = useMemo(() => searchParams.get('treatment') || undefined, [searchParams]);
   
   const [isPending, startTransition] = useTransition();
 
