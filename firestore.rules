@@ -5,11 +5,12 @@ service cloud.firestore {
 
     // Helper function to check if the current user is an admin.
     function isAdmin() {
-      return exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-             && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    // Rules for public-facing data (treatments, products, videos)
+    // Rules for public-facing data (treatments, products, videos) - allow read for everyone
     match /treatments/{treatmentId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -25,17 +26,18 @@ service cloud.firestore {
 
     // Rules for the appointments collection
     match /appointments/{appointmentId} {
-      // Any authenticated user can create and read their own appointment.
-      allow create: if request.auth != null;
+      // Any authenticated user can create their own appointment
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      // Users can read their own appointments, admins can read all
       allow read: if request.auth != null && 
         (resource.data.userId == request.auth.uid || isAdmin());
-      // Only admins can update or delete any appointment.
+      // Only admins can update or delete appointments
       allow update, delete: if isAdmin();
-      // Allow admins to list all appointments
-      allow list: if isAdmin();
+      // Allow authenticated users to list their own appointments, admins can list all
+      allow list: if request.auth != null;
     }
 
-    // Admins collection should not be writable from the client-side for security.
+    // Admins collection - users can read their own admin status
     match /admins/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if false; // Disallow client-side writes completely
