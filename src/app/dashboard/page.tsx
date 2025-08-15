@@ -21,42 +21,61 @@ export default function DashboardPage() {
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && (!user || !isAdmin)) {
-      router.push('/login');
+    // Wait until authentication is resolved before checking permissions
+    if (!authLoading) {
+      if (!user || !isAdmin) {
+        // Use replace to prevent the user from navigating back to the dashboard
+        router.replace('/login');
+      }
     }
   }, [user, authLoading, isAdmin, router]);
 
   useEffect(() => {
+    let unsubscribe: () => void = () => {};
     if (user && isAdmin) {
       setDataLoading(true);
-      const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const appointmentsData = querySnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data,
-            date: data.date.toDate(), // Convert Firestore Timestamp to JS Date
-            createdAt: data.createdAt,
-          } as Appointment;
+      try {
+        const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+        unsubscribe = onSnapshot(q, (querySnapshot) => {
+          const appointmentsData = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              ...data,
+              date: data.date.toDate(), // Convert Firestore Timestamp to JS Date
+              createdAt: data.createdAt,
+            } as Appointment;
+          });
+          setAppointments(appointmentsData);
+          setDataLoading(false);
+        }, (error) => {
+          console.error("Error fetching appointments: ", error);
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Could not fetch appointments from the database.'
+          });
+          setDataLoading(false);
         });
-        setAppointments(appointmentsData);
+      } catch (error) {
+        console.error("Firestore query error: ", error);
+         toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Could not set up the appointment listener.'
+          });
         setDataLoading(false);
-      }, (error) => {
-        console.error("Error fetching appointments: ", error);
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Could not fetch appointments from the database.'
-        });
+      }
+    } else {
+        // If the user is not an admin, we don't need to load data.
         setDataLoading(false);
-      });
-
-      return () => unsubscribe();
     }
+    // Cleanup function
+    return () => unsubscribe();
   }, [user, isAdmin, toast]);
   
-  if (authLoading || dataLoading || !user || !isAdmin) {
+  // Display a loader while auth state is resolving or data is being fetched.
+  if (authLoading || (!isAdmin && !dataLoading) || !user) {
     return (
         <div className="flex h-screen w-full items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

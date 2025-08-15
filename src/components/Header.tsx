@@ -18,6 +18,8 @@ export function Header() {
 
   const handleLogout = async () => {
     await auth.signOut();
+    // The useAuth hook will handle redirection automatically when the user state changes.
+    // This prevents a race condition and ensures a smooth, no-refresh experience.
     router.push('/');
   };
   
