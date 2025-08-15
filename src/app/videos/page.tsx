@@ -17,10 +17,10 @@ export default async function VideosPage() {
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
-            <main className="flex-1 py-12 bg-secondary/50">
+            <main className="flex-1 py-12 md:py-16 bg-secondary">
                 <div className="container mx-auto px-4 md:px-6">
                      <div className="text-center mb-12">
-                        <h1 className="text-3xl font-bold tracking-tight text-primary">Informative Videos</h1>
+                        <h1 className="text-4xl font-headline tracking-tight text-primary">Informative Videos</h1>
                         <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
                             Watch these videos curated by Dr. Amiya to learn more about physiotherapy techniques, exercises, and self-care for pain management.
                         </p>
@@ -28,11 +28,11 @@ export default async function VideosPage() {
 
                     <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8">
                         {videos.map(video => (
-                            <Card key={video.id}>
-                                <CardHeader>
+                            <Card key={video.id} className="overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <CardHeader className="p-0">
                                     <AspectRatio ratio={16 / 9}>
                                         <iframe
-                                            className="w-full h-full rounded-md"
+                                            className="w-full h-full"
                                             src={`https://www.youtube.com/embed/${video.youtubeId}`}
                                             title={video.title}
                                             frameBorder="0"
@@ -41,18 +41,18 @@ export default async function VideosPage() {
                                         ></iframe>
                                     </AspectRatio>
                                 </CardHeader>
-                                <CardContent>
-                                    <CardTitle>{video.title}</CardTitle>
-                                    <CardDescription className="mt-2">{video.description}</CardDescription>
+                                <CardContent className="p-6">
+                                    <CardTitle className="font-headline text-primary">{video.title}</CardTitle>
+                                    <CardDescription className="mt-2 text-muted-foreground">{video.description}</CardDescription>
                                 </CardContent>
                             </Card>
                         ))}
                     </div>
                 </div>
             </main>
-            <footer className="bg-primary text-primary-foreground py-6 border-t">
+            <footer className="bg-deep-highlight text-deep-highlight-foreground py-6 border-t border-deep-highlight/50">
                 <div className="container text-center text-sm">
-                © {new Date().getFullYear()} Pain Manage Clinic. All rights reserved.
+                © {new Date().getFullYear()} PhysioEase Clinic. All rights reserved.
                 </div>
             </footer>
         </div>

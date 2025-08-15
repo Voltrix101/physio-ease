@@ -11,7 +11,7 @@ interface TreatmentCardProps {
 
 export function TreatmentCard({ treatment }: TreatmentCardProps) {
   return (
-    <Card className="flex flex-col h-full overflow-hidden transition-shadow duration-300 hover:shadow-xl border-t-4 border-t-primary/20 hover:border-t-primary">
+    <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 rounded-lg border-transparent">
       <CardHeader className="p-0">
         <div className="relative h-48 w-full">
           <Image
@@ -19,28 +19,29 @@ export function TreatmentCard({ treatment }: TreatmentCardProps) {
             alt={treatment.name}
             layout="fill"
             objectFit="cover"
+            className="rounded-t-lg"
             data-ai-hint={treatment.dataAiHint}
           />
         </div>
         <div className="p-6">
-          <CardTitle className="text-xl">{treatment.name}</CardTitle>
+          <CardTitle className="text-xl font-headline text-primary">{treatment.name}</CardTitle>
           <CardDescription className="pt-2">{treatment.description}</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="flex-grow p-6 pt-0 flex flex-col justify-between">
         <div className="flex justify-between text-sm text-muted-foreground mb-4">
             <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4" />
-                <span>₹{treatment.price}</span>
+                <Tag className="h-4 w-4 text-primary" />
+                <span className="font-semibold text-primary/90">₹{treatment.price}</span>
             </div>
             <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                <span>{treatment.duration} mins</span>
+                <Clock className="h-4 w-4 text-primary" />
+                <span className="font-semibold text-primary/90">{treatment.duration} mins</span>
             </div>
         </div>
       </CardContent>
-      <CardFooter className="p-6 pt-0 bg-primary/5">
-        <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+      <CardFooter className="p-6 pt-0 mt-auto">
+        <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90 shadow-md transition-shadow hover:shadow-lg hover:glow-sm">
           <Link href={`/book?treatment=${treatment.id}`}>Book This Service</Link>
         </Button>
       </CardFooter>

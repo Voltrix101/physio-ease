@@ -106,30 +106,30 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   
   return (
     <div className="space-y-8">
-      <Progress value={(step / 3) * 100} className="w-full" />
+      <Progress value={(step / 3) * 100} className="w-full h-2 bg-secondary" />
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {step === 1 && (
           <div className="space-y-4 animate-in fade-in-0 duration-500">
-            <h3 className="text-lg font-medium">Step 1: Choose Your Service</h3>
+            <h3 className="text-xl font-headline">Step 1: Choose Your Service</h3>
             <Controller
               control={form.control}
               name="treatmentId"
               render={({ field }) => (
                 <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {treatments.map((treatment) => (
-                    <Label key={treatment.id} htmlFor={treatment.id} className="flex flex-col items-start justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer">
+                    <Label key={treatment.id} htmlFor={treatment.id} className="flex flex-col items-start justify-between rounded-lg border-2 border-muted bg-background p-4 hover:bg-accent/10 hover:border-accent peer-data-[state=checked]:border-accent peer-data-[state=checked]:bg-accent/5 [&:has([data-state=checked])]:border-accent cursor-pointer transition-colors">
                       <RadioGroupItem value={treatment.id} id={treatment.id} className="sr-only" />
-                      <span className="font-semibold text-lg">{treatment.name}</span>
+                      <span className="font-semibold font-headline text-lg text-primary">{treatment.name}</span>
                       <span className="text-sm text-muted-foreground mt-2">{treatment.description}</span>
-                      <span className="font-bold text-primary mt-4">₹{treatment.price} - {treatment.duration} mins</span>
+                      <span className="font-bold text-primary/80 mt-4">₹{treatment.price} - {treatment.duration} mins</span>
                     </Label>
                   ))}
                 </RadioGroup>
               )}
             />
-             {form.formState.errors.treatmentId && <p className="text-sm text-red-500">{form.formState.errors.treatmentId.message}</p>}
+             {form.formState.errors.treatmentId && <p className="text-sm text-destructive">{form.formState.errors.treatmentId.message}</p>}
             <div className="flex justify-end">
-              <Button type="button" onClick={nextStep} disabled={!selectedTreatmentId}>
+              <Button type="button" onClick={nextStep} disabled={!selectedTreatmentId} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 Next <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
@@ -138,10 +138,10 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
 
         {step === 2 && (
           <div className="space-y-4 animate-in fade-in-0 duration-500">
-            <h3 className="text-lg font-medium">Step 2: Select Date & Time</h3>
+            <h3 className="text-xl font-headline">Step 2: Select Date & Time</h3>
             <div className="grid md:grid-cols-2 gap-8">
                 <Controller name="date" control={form.control} render={({ field }) => (
-                    <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))} className="rounded-md border p-0" />
+                    <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))} className="rounded-lg border" />
                 )} />
                  <div className="space-y-4">
                     <Controller name="time" control={form.control} render={({ field }) => (
@@ -152,13 +152,13 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
                             </SelectContent>
                          </Select>
                     )} />
-                    {form.formState.errors.date && <p className="text-sm text-red-500">{form.formState.errors.date.message}</p>}
-                    {form.formState.errors.time && <p className="text-sm text-red-500">{form.formState.errors.time.message}</p>}
+                    {form.formState.errors.date && <p className="text-sm text-destructive">{form.formState.errors.date.message}</p>}
+                    {form.formState.errors.time && <p className="text-sm text-destructive">{form.formState.errors.time.message}</p>}
                 </div>
             </div>
             <div className="flex justify-between">
               <Button type="button" variant="outline" onClick={prevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-              <Button type="button" onClick={nextStep} disabled={!form.watch('date') || !form.watch('time')}>
+              <Button type="button" onClick={nextStep} disabled={!form.watch('date') || !form.watch('time')} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 Next <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
@@ -167,11 +167,11 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
 
         {step === 3 && (
           <div className="space-y-4 animate-in fade-in-0 duration-500">
-            <h3 className="text-lg font-medium">Step 3: Your Details & Payment Proof</h3>
+            <h3 className="text-xl font-headline">Step 3: Your Details & Payment Proof</h3>
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input id="name" {...form.register('name')} placeholder="e.g. Jane Doe" />
-              {form.formState.errors.name && <p className="text-sm text-red-500">{form.formState.errors.name.message}</p>}
+              {form.formState.errors.name && <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>}
             </div>
             
             <Controller name="paymentProofType" control={form.control} render={({field}) => (
@@ -192,16 +192,16 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
                     <Input id="paymentProofText" {...form.register('paymentProofText')} placeholder="Enter UPI transaction ID" />
                 </div>
             )}
-             {form.formState.errors.paymentProofFile && <p className="text-sm text-red-500">{form.formState.errors.paymentProofFile.message}</p>}
+             {form.formState.errors.paymentProofFile && <p className="text-sm text-destructive">{form.formState.errors.paymentProofFile.message}</p>}
             
             <div className="flex justify-between">
               <Button type="button" variant="outline" onClick={prevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-              <Button type="submit" disabled={isPending}>
+              <Button type="submit" disabled={isPending} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Request Appointment
               </Button>
             </div>
-            {state.message && !state.success && <p className="text-sm text-red-500">{state.message}</p>}
+            {state.message && !state.success && <p className="text-sm text-destructive">{state.message}</p>}
           </div>
         )}
       </form>

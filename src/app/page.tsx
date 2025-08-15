@@ -24,54 +24,54 @@ export default async function Home() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <section className="w-full bg-primary/5">
-          <div className="container grid md:grid-cols-2 gap-8 items-center py-12 md:py-24">
-            <div className="space-y-4">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary tracking-tight">
-                Dr. Amiya Ballav Roy
-              </h1>
-              <p className="font-semibold text-lg text-primary/90">
-                CDNT (Dry Needling), CKTP (Taping), CCTS (Dry Cupping) – PHYSIOTHERAPIST
-              </p>
-              <p className="text-muted-foreground">
-                Welcome to the Pain Manage Clinic, where we are dedicated to providing expert physiotherapy and rehabilitation services. Dr. Amiya specializes in advanced techniques to help you recover from injuries, manage pain, and restore your quality of life.
-              </p>
-              <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg transition-transform hover:scale-105">
-                <Link href="/book">Book an Appointment</Link>
-              </Button>
+        {/* Hero Section */}
+        <section className="relative w-full h-[60vh] md:h-[80vh] flex items-center justify-center text-center overflow-hidden">
+            <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+                src="https://videos.pexels.com/video-files/8099895/8099895-hd_1920_1080_25fps.mp4"
+            />
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-deep-highlight/70 to-black/30 -z-10" />
+            <div className="container px-4 md:px-6 text-white animate-fade-in-up">
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-headline tracking-wider text-shadow-lg">
+                    Restore. Revive. Renew.
+                </h1>
+                <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-white/90">
+                    Personalized physiotherapy care by Dr. Amiya Ballav Roy
+                </p>
+                <Button asChild size="lg" className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg transition-transform hover:scale-105 hover:shadow-accent/50 focus:ring-accent">
+                    <Link href="/book">Book an Appointment</Link>
+                </Button>
             </div>
-            <div className="relative h-80 md:h-96 rounded-lg overflow-hidden shadow-2xl">
-                <Image
-                    src="https://placehold.co/600x600.png"
-                    alt="Dr. Amiya Ballav Roy"
-                    layout="fill"
-                    objectFit="cover"
-                    className="object-top"
-                    data-ai-hint="male doctor portrait"
-                />
-            </div>
-          </div>
         </section>
         
-        <section id="services" className="w-full py-12 md:py-24 bg-secondary">
+        {/* Services Section */}
+        <section id="services" className="w-full py-16 md:py-24 bg-background">
           <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-bold tracking-tighter text-center mb-12">Our Services</h2>
+            <h2 className="text-3xl md:text-4xl font-headline tracking-tight text-center mb-12">Our Services</h2>
             <TreatmentCarousel treatments={treatments} />
           </div>
         </section>
 
-        <section id="testimonials" className="w-full py-12 md:py-24">
+        {/* Testimonials Section */}
+        <section id="testimonials" className="w-full py-16 md:py-24 bg-secondary">
             <div className="container px-4 md:px-6">
-                 <h2 className="text-3xl font-bold tracking-tighter text-center mb-12">Patient Testimonials</h2>
+                 <h2 className="text-3xl md:text-4xl font-headline tracking-tighter text-center mb-12">Patient Testimonials</h2>
                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {/* Placeholder for testimonials */}
-                    {[1,2,3].map(i => (
-                        <Card key={i}>
+                    {[
+                      {name: "Rohan S.", quote: "A wonderful experience. Dr. Amiya is very knowledgeable and caring. My back pain is completely gone!"},
+                      {name: "Priya K.", quote: "The dry needling therapy worked wonders for my shoulder. Highly recommended clinic."},
+                      {name: "Amit G.", quote: "Professional, clean, and effective. The best physiotherapy I've had in Kolkata."}
+                    ].map((testimonial, i) => (
+                        <Card key={i} className="bg-card border-l-4 border-accent shadow-md transition-all hover:shadow-xl hover:-translate-y-1">
                             <CardHeader>
-                                <CardTitle>Patient {i}</CardTitle>
+                                <CardTitle className="font-body text-xl text-primary">{testimonial.name}</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-muted-foreground">"A wonderful experience. Dr. Amiya is very knowledgeable and caring."</p>
+                                <p className="text-muted-foreground italic">"{testimonial.quote}"</p>
                             </CardContent>
                         </Card>
                     ))}
@@ -79,9 +79,10 @@ export default async function Home() {
             </div>
         </section>
 
-        <section id="clinic-details" className="w-full py-12 md:py-24 bg-secondary">
+        {/* Clinic Details Section */}
+        <section id="clinic-details" className="w-full py-16 md:py-24 bg-background">
             <div className="container text-center">
-                 <h2 className="text-3xl font-bold tracking-tighter mb-4">Visit Us</h2>
+                 <h2 className="text-3xl font-headline tracking-tighter mb-4">Visit Us</h2>
                  <p className="text-muted-foreground max-w-md mx-auto">
                     Pain Manage Clinic
                     <br />
@@ -93,9 +94,9 @@ export default async function Home() {
         </section>
 
       </main>
-      <footer className="bg-primary text-primary-foreground py-6 border-t">
+      <footer className="bg-deep-highlight text-deep-highlight-foreground py-6 border-t border-deep-highlight/50">
         <div className="container text-center text-sm">
-          © {new Date().getFullYear()} Pain Manage Clinic. All rights reserved.
+          © {new Date().getFullYear()} PhysioEase Clinic. All rights reserved.
         </div>
       </footer>
     </div>

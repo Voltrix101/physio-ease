@@ -17,10 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-geist-sans)'],
-        body: ['Roboto', 'sans-serif'],
-        headline: ['Roboto', 'sans-serif'],
-        code: ['monospace'],
+        body: ['var(--font-poppins)', 'sans-serif'],
+        headline: ['var(--font-playfair-display)', 'serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -52,6 +50,10 @@ export default {
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
+        },
+        'deep-highlight': {
+          DEFAULT: 'hsl(var(--deep-highlight))',
+          foreground: 'hsl(var(--deep-highlight-foreground))'
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

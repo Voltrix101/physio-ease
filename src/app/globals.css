@@ -4,48 +4,63 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 179 60% 35%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 180 4% 96%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 180 4% 90%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 179 50% 45%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 179 60% 35%;
-    --radius: 0.5rem;
+    --background: 40 33% 98%; /* #faf8f3 */
+    --foreground: 155 24% 10%;
+
+    --card: 40 33% 98%;
+    --card-foreground: 155 24% 10%;
+
+    --popover: 40 33% 98%;
+    --popover-foreground: 155 24% 10%;
+
+    --primary: 175 24% 55%; /* #70a8a3 - Muted Teal */
+    --primary-foreground: 40 33% 99%;
+
+    --secondary: 40 10% 95%;
+    --secondary-foreground: 155 24% 15%;
+
+    --muted: 40 5% 90%;
+    --muted-foreground: 155 10% 40%;
+    
+    --accent: 35 63% 65%; /* #e0a96d - Golden Tan */
+    --accent-foreground: 155 24% 15%;
+
+    --destructive: 5 82% 76%; /* #f28c82 - Soft Coral */
+    --destructive-foreground: 40 33% 99%;
+    
+    --deep-highlight: 155 24% 24%; /* #2e4a3f - Forest Green */
+    --deep-highlight-foreground: 40 33% 95%;
+
+    --border: 40 10% 88%;
+    --input: 40 10% 92%;
+    --ring: 175 24% 55%;
+    
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 0 0% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 179 60% 35%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 179 50% 45%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 179 60% 35%;
+    /* Keeping dark mode similar for now, can be updated later */
+    --background: 155 24% 10%;
+    --foreground: 40 33% 98%;
+    --card: 155 24% 10%;
+    --card-foreground: 40 33% 98%;
+    --popover: 155 24% 10%;
+    --popover-foreground: 40 33% 98%;
+    --primary: 175 24% 55%;
+    --primary-foreground: 40 33% 99%;
+    --secondary: 155 20% 15%;
+    --secondary-foreground: 40 33% 98%;
+    --muted: 155 20% 20%;
+    --muted-foreground: 40 10% 60%;
+    --accent: 35 63% 65%;
+    --accent-foreground: 155 24% 10%;
+    --destructive: 5 82% 76%;
+    --destructive-foreground: 40 33% 99%;
+    --deep-highlight: 155 24% 24%;
+    --deep-highlight-foreground: 40 33% 95%;
+    --border: 155 20% 25%;
+    --input: 155 20% 22%;
+    --ring: 175 24% 55%;
   }
 }
 
@@ -55,5 +70,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline text-primary;
   }
 }
