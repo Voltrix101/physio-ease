@@ -1,3 +1,6 @@
+
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -7,6 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import type { Treatment } from '@/lib/types';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
 
 
 async function getTreatments(): Promise<Treatment[]> {
@@ -17,8 +23,26 @@ async function getTreatments(): Promise<Treatment[]> {
 }
 
 
-export default async function Home() {
-  const treatments = await getTreatments();
+export default function Home() {
+  const [treatments, setTreatments] = useState<Treatment[]>([]);
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    async function fetchTreatments() {
+        const fetchedTreatments = await getTreatments();
+        setTreatments(fetchedTreatments);
+    }
+    fetchTreatments();
+  }, []);
+  
+  const handleBookAppointmentClick = () => {
+    if (user) {
+      router.push('/book');
+    } else {
+      router.push('/login');
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#faf8f3]">
@@ -37,8 +61,8 @@ export default async function Home() {
           <div className="relative z-10 max-w-2xl animate-riseUp">
             <h1 className="text-5xl md:text-6xl font-headline mb-4 tracking-wide text-white">Restore. Revive. Renew.</h1>
             <p className="text-lg md:text-xl mb-6 text-white/90">Personalized physiotherapy care by Dr. Amiya Ballav Roy</p>
-            <Button asChild size="lg" className="bg-[#e0a96d] text-black px-6 py-3 rounded-lg text-lg font-medium hover:bg-[#d18f50] hover:scale-105 transform transition">
-              <Link href="/book">Book Appointment</Link>
+            <Button onClick={handleBookAppointmentClick} size="lg" className="bg-[#e0a96d] text-black px-6 py-3 rounded-lg text-lg font-medium hover:bg-[#d18f50] hover:scale-105 transform transition">
+              Book Appointment
             </Button>
           </div>
         </section>
@@ -51,8 +75,8 @@ export default async function Home() {
           <p className="max-w-2xl mx-auto mb-6 text-muted-foreground">
             Specialist in Dry Needling, Taping, and Dry Cupping techniques with a focus on holistic pain management and recovery.
           </p>
-           <Button asChild size="lg" className="bg-[#e0a96d] text-black px-6 py-3 rounded-lg hover:bg-[#d18f50] hover:scale-105 transform transition">
-              <Link href="/book">Book Appointment</Link>
+           <Button onClick={handleBookAppointmentClick} size="lg" className="bg-[#e0a96d] text-black px-6 py-3 rounded-lg hover:bg-[#d18f50] hover:scale-105 transform transition">
+              Book Appointment
             </Button>
         </section>
         

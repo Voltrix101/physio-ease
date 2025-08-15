@@ -16,6 +16,14 @@ export function Header() {
     await auth.signOut();
     router.push('/');
   };
+  
+  const handleBookAppointmentClick = () => {
+    if (user) {
+      router.push('/book');
+    } else {
+      router.push('/login');
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#2e4a3f] text-white px-6 py-4 flex justify-between items-center shadow-md animate-slideDown">
@@ -35,8 +43,8 @@ export function Header() {
            )}
         </nav>
         <div className="flex items-center gap-2">
-            <Button asChild className="bg-[#e0a96d] text-black px-4 py-2 rounded-lg hover:bg-[#d18f50] hover:scale-105 transform transition">
-                <Link href="/book">Book Appointment</Link>
+            <Button onClick={handleBookAppointmentClick} className="bg-[#e0a96d] text-black px-4 py-2 rounded-lg hover:bg-[#d18f50] hover:scale-105 transform transition">
+                Book Appointment
             </Button>
             {!loading && user && (
                  <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout" className="hover:bg-white/10">
