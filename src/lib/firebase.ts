@@ -7,12 +7,12 @@ import { getFirestore } from "firebase/firestore";
 // Your web app's Firebase configuration
 // IMPORTANT: Replace this with your actual Firebase config object
 const firebaseConfig = {
-  apiKey: "REPLACE_WITH_YOUR_API_KEY",
-  authDomain: "REPLACE_WITH_YOUR_AUTH_DOMAIN",
-  projectId: "REPLACE_WITH_YOUR_PROJECT_ID",
-  storageBucket: "REPLACE_WITH_YOUR_STORAGE_BUCKET",
-  messagingSenderId: "REPLACE_WITH_YOUR_MESSAGING_SENDER_ID",
-  appId: "REPLACE_WITH_YOUR_APP_ID"
+  "projectId": "physioease",
+  "appId": "1:709140659977:web:db791975eb6d098b935dd8",
+  "storageBucket": "physioease.firebasestorage.app",
+  "apiKey": "AIzaSyBrihfkVqqN-RchiYjaoqr-jFwROVnuAFM",
+  "authDomain": "physioease.firebaseapp.com",
+  "messagingSenderId": "709140659977"
 };
 
 // Initialize Firebase
@@ -21,3 +21,4 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 export { app, auth, db };
+
