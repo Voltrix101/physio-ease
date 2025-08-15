@@ -20,11 +20,15 @@ export function DashboardClient({ appointments }: DashboardClientProps) {
   const activeTab = searchParams.get('tab') || 'appointments';
 
   const handleTabChange = (value: string) => {
+    // This uses the Next.js router to update the URL without a page reload.
     router.push(`${pathname}?tab=${value}`, { scroll: false });
   };
 
+  // Using `defaultValue` ensures the initial state is correct on page load.
+  // `onValueChange` handles all subsequent clicks, updating the URL.
+  // This combination prevents the component from re-triggering a full render cycle.
   return (
-    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+    <Tabs defaultValue={activeTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
         <TabsTrigger value="appointments">
           <Calendar className="mr-2 h-4 w-4" />
