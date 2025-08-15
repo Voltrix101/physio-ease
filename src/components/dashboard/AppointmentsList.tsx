@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Appointment } from "@/lib/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AppointmentsTable } from './AppointmentsTable';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { useToast } from '@/hooks/use-toast';
 
 interface AppointmentsListProps {
     initialAppointments: Appointment[];
@@ -14,9 +17,31 @@ interface AppointmentsListProps {
 export function AppointmentsList({ initialAppointments }: AppointmentsListProps) {
     const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
     const [searchTerm, setSearchTerm] = useState('');
+    const { toast } = useToast();
 
-    const handleAppointmentUpdate = (updatedAppointment: Appointment) => {
-        setAppointments(prev => prev.map(app => app.id === updatedAppointment.id ? updatedAppointment : app));
+    useEffect(() => {
+        setAppointments(initialAppointments);
+    }, [initialAppointments]);
+
+    const handleAppointmentUpdate = async (updatedAppointment: Appointment) => {
+        try {
+            const appointmentRef = doc(db, 'appointments', updatedAppointment.id);
+            await updateDoc(appointmentRef, {
+                status: updatedAppointment.status
+            });
+            // The list will be updated automatically by the onSnapshot listener in the parent
+             toast({
+                title: "Appointment Updated",
+                description: `${updatedAppointment.patientName}'s appointment set to ${updatedAppointment.status}.`,
+            });
+        } catch (error) {
+            console.error("Error updating appointment status: ", error);
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: 'Failed to update appointment status.'
+            });
+        }
     };
 
     const filteredAppointments = appointments.filter(appointment =>

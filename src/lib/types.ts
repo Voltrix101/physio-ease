@@ -1,4 +1,5 @@
 import type { VerifyPaymentProofOutput } from "@/ai/flows/verify-payment-proof";
+import type { Timestamp } from "firebase/firestore";
 
 export interface Treatment {
   id: string;
@@ -31,11 +32,12 @@ export type AppointmentStatus = 'pending' | 'confirmed' | 'rejected' | 'complete
 export interface Appointment {
   id: string;
   patientName: string;
+  treatmentId: string;
   treatmentName: string;
-  date: Date;
+  date: Date | Timestamp; // Allow both for client-side and Firestore
+  time: string;
   status: AppointmentStatus;
-  paymentReference: string;
-  paymentProofUrl?: string;
+  paymentProof: string;
   paymentVerification?: VerifyPaymentProofOutput;
-  createdAt: Date;
+  createdAt: Timestamp;
 }

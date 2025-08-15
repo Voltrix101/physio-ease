@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CheckCircle, HelpCircle, Info, XCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import type { Timestamp } from 'firebase/firestore';
 
 interface AppointmentsTableProps {
   appointments: Appointment[];
@@ -21,30 +21,26 @@ const statusConfig = {
     rejected: { label: "Rejected", variant: "destructive", icon: XCircle },
 };
 
-function FormattedDate({ date }: { date: Date }) {
+function FormattedDate({ date }: { date: Date | Timestamp }) {
   const [formattedDate, setFormattedDate] = useState('');
 
   useEffect(() => {
-    setFormattedDate(date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }));
+    const jsDate = date instanceof Date ? date : date.toDate();
+    setFormattedDate(jsDate.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }));
   }, [date]);
 
   return <>{formattedDate}</>;
 }
 
 export function AppointmentsTable({ appointments, onUpdate }: AppointmentsTableProps) {
-  const { toast } = useToast();
   
   const handleStatusChange = (appointment: Appointment, status: AppointmentStatus) => {
     const updatedAppointment = { ...appointment, status };
     onUpdate(updatedAppointment);
-    toast({
-      title: "Appointment Updated",
-      description: `${appointment.patientName}'s appointment set to ${status}.`,
-    });
   };
 
   if (appointments.length === 0) {
-    return <div className="text-center text-muted-foreground py-8">No appointments found.</div>
+    return <div className="text-center text-muted-foreground py-8">No appointments found in this category.</div>
   }
 
   return (
@@ -89,7 +85,7 @@ export function AppointmentsTable({ appointments, onUpdate }: AppointmentsTableP
                   {appointment.status !== 'pending' && <span className="text-muted-foreground">-</span>}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={currentStatus.variant} className={currentStatus.className}>{currentStatus.label}</Badge>
+                  <Badge variant={currentStatus.variant as any} className={currentStatus.className}>{currentStatus.label}</Badge>
                 </TableCell>
                 <TableCell className="text-right">
                     {appointment.status === 'pending' && (

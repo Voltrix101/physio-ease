@@ -3,6 +3,9 @@
 import { z } from 'zod';
 import { verifyPaymentProof } from '@/ai/flows/verify-payment-proof';
 import type { VerifyPaymentProofOutput } from '@/ai/flows/verify-payment-proof';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { mockServices } from '@/lib/data';
 
 const FormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -42,15 +45,24 @@ export async function createAppointment(prevState: State, formData: FormData) {
         };
     }
 
-    const { paymentProof } = validatedFields.data;
+    const { name, treatmentId, date, time, paymentProof } = validatedFields.data;
 
     try {
         const verificationResult = await verifyPaymentProof({ paymentProof });
         
-        // In a real application, you would save the appointment to Firestore here,
-        // including the patient name, treatment, date, time, and the AI verification result.
+        const selectedTreatment = mockServices.find(t => t.id === treatmentId);
         
-        console.log('AI Verification:', verificationResult);
+        await addDoc(collection(db, 'appointments'), {
+            patientName: name,
+            treatmentId: treatmentId,
+            treatmentName: selectedTreatment?.name || 'Unknown Treatment',
+            date: new Date(date),
+            time: time,
+            paymentProof: paymentProof,
+            paymentVerification: verificationResult,
+            status: 'pending',
+            createdAt: serverTimestamp(),
+        });
 
         return {
             message: 'Appointment requested successfully!',
@@ -58,9 +70,10 @@ export async function createAppointment(prevState: State, formData: FormData) {
             data: verificationResult,
         };
     } catch (error) {
-        console.error('AI Verification Error:', error);
+        console.error('Error creating appointment:', error);
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
         return {
-            message: 'Failed to verify payment proof. Please try again.',
+            message: `Failed to create appointment: ${errorMessage}`,
             success: false,
         };
     }
