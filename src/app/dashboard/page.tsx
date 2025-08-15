@@ -13,7 +13,7 @@ import type { Appointment } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 export default function DashboardPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, isAdmin } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -21,13 +21,13 @@ export default function DashboardPage() {
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/admin/login');
+    if (!authLoading && (!user || !isAdmin)) {
+      router.push('/login');
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, isAdmin, router]);
 
   useEffect(() => {
-    if (user) {
+    if (user && isAdmin) {
       setDataLoading(true);
       const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -54,9 +54,9 @@ export default function DashboardPage() {
 
       return () => unsubscribe();
     }
-  }, [user, toast]);
+  }, [user, isAdmin, toast]);
   
-  if (authLoading || dataLoading || !user) {
+  if (authLoading || dataLoading || !user || !isAdmin) {
     return (
         <div className="flex h-screen w-full items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

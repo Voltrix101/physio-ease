@@ -3,13 +3,13 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Stethoscope, LogOut, LayoutDashboard } from 'lucide-react';
+import { Stethoscope, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 
 export function Header() {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -29,13 +29,13 @@ export function Header() {
            <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">About</Link>
            <Link href="/products" className="text-sm font-medium hover:text-primary transition-colors">Products</Link>
            <Link href="/videos" className="text-sm font-medium hover:text-primary transition-colors">Videos</Link>
-           {user && (
+           {user && isAdmin && (
             <Link href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">Dashboard</Link>
            )}
         </nav>
         <div className="flex items-center gap-2">
             <Button asChild variant="default" className="bg-primary hover:bg-primary/90">
-                <Link href="/book">Book Now</Link>
+                <Link href="/login">Book Now</Link>
             </Button>
             {!loading && user && (
                  <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout">
