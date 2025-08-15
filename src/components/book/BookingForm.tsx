@@ -1,11 +1,12 @@
 
 'use client';
 
-import { useState, useTransition, useActionState } from 'react';
+import { useState, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useActionState } from 'react';
 
 import { createAppointment, type State } from '@/app/book/actions';
 import type { Treatment } from '@/lib/types';
@@ -30,7 +31,7 @@ const formSchema = z.object({
   paymentProofFile: z.any().optional(),
 }).refine(data => {
     if (data.paymentProofType === 'text') return !!data.paymentProofText;
-    if (data.paymentProofType === 'image') return !!data.paymentProofFile;
+    if (data.paymentProofType === 'image') return !!data.paymentProofFile?.[0];
     return false;
 }, { message: 'Payment proof is required', path: ['paymentProofFile']});
 
@@ -45,7 +46,7 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   const defaultTreatmentId = searchParams.get('treatment') || undefined;
 
   const initialState: State = { message: null, errors: {}, success: false };
-  const [state, dispatch] = useActionState(createAppointment, initialState);
+  const [state, formAction] = useActionState(createAppointment, initialState);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,32 +71,31 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
     });
   };
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('treatmentId', data.treatmentId);
-    formData.append('date', data.date.toISOString());
-    formData.append('time', data.time);
-    
-    let proof = '';
-    if (data.paymentProofType === 'text' && data.paymentProofText) {
-      proof = data.paymentProofText;
-    } else if (data.paymentProofType === 'image' && data.paymentProofFile?.[0]) {
-      try {
-        proof = await readFileAsDataURL(data.paymentProofFile[0]);
-      } catch (error) {
-        toast({
-            variant: "destructive",
-            title: "File Error",
-            description: "Could not read the uploaded file. Please try again.",
-        });
-        return;
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.append('name', data.name);
+      formData.append('treatmentId', data.treatmentId);
+      formData.append('date', data.date.toISOString());
+      formData.append('time', data.time);
+      
+      let proof = '';
+      if (data.paymentProofType === 'text' && data.paymentProofText) {
+        proof = data.paymentProofText;
+      } else if (data.paymentProofType === 'image' && data.paymentProofFile?.[0]) {
+        try {
+          proof = await readFileAsDataURL(data.paymentProofFile[0]);
+        } catch (error) {
+          toast({
+              variant: "destructive",
+              title: "File Error",
+              description: "Could not read the uploaded file. Please try again.",
+          });
+          return;
+        }
       }
-    }
-    formData.append('paymentProof', proof);
-
-    startTransition(() => {
-        dispatch(formData);
+      formData.append('paymentProof', proof);
+      formAction(formData);
     });
   };
 
@@ -126,8 +126,9 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
                 </RadioGroup>
               )}
             />
+             {form.formState.errors.treatmentId && <p className="text-sm text-red-500">{form.formState.errors.treatmentId.message}</p>}
             <div className="flex justify-end">
-              <Button onClick={nextStep} disabled={!selectedTreatmentId}>
+              <Button type="button" onClick={nextStep} disabled={!selectedTreatmentId}>
                 Next <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
@@ -141,18 +142,22 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
                 <Controller name="date" control={form.control} render={({ field }) => (
                     <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))} className="rounded-md border p-0" />
                 )} />
-                <Controller name="time" control={form.control} render={({ field }) => (
-                     <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger><SelectValue placeholder="Select a time slot" /></SelectTrigger>
-                        <SelectContent>
-                            {timeSlots.map(slot => <SelectItem key={slot} value={slot}>{slot}</SelectItem>)}
-                        </SelectContent>
-                     </Select>
-                )} />
+                 <div className="space-y-4">
+                    <Controller name="time" control={form.control} render={({ field }) => (
+                         <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger><SelectValue placeholder="Select a time slot" /></SelectTrigger>
+                            <SelectContent>
+                                {timeSlots.map(slot => <SelectItem key={slot} value={slot}>{slot}</SelectItem>)}
+                            </SelectContent>
+                         </Select>
+                    )} />
+                    {form.formState.errors.date && <p className="text-sm text-red-500">{form.formState.errors.date.message}</p>}
+                    {form.formState.errors.time && <p className="text-sm text-red-500">{form.formState.errors.time.message}</p>}
+                </div>
             </div>
             <div className="flex justify-between">
-              <Button variant="outline" onClick={prevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-              <Button onClick={nextStep} disabled={!form.watch('date') || !form.watch('time')}>
+              <Button type="button" variant="outline" onClick={prevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+              <Button type="button" onClick={nextStep} disabled={!form.watch('date') || !form.watch('time')}>
                 Next <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
@@ -186,9 +191,10 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
                     <Input id="paymentProofText" {...form.register('paymentProofText')} placeholder="Enter UPI transaction ID" />
                 </div>
             )}
+             {form.formState.errors.paymentProofFile && <p className="text-sm text-red-500">{form.formState.errors.paymentProofFile.message}</p>}
             
             <div className="flex justify-between">
-              <Button variant="outline" onClick={prevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+              <Button type="button" variant="outline" onClick={prevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
               <Button type="submit" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Request Appointment
