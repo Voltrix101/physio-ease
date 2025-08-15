@@ -1,8 +1,7 @@
 
 'use client';
 
-import { useState, useTransition } from 'react';
-import { useFormState } from 'react-dom';
+import { useState, useTransition, useActionState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,7 +45,7 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   const defaultTreatmentId = searchParams.get('treatment') || undefined;
 
   const initialState: State = { message: null, errors: {}, success: false };
-  const [state, dispatch] = useFormState(createAppointment, initialState);
+  const [state, dispatch] = useActionState(createAppointment, initialState);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
