@@ -34,11 +34,11 @@ export default function AboutPage() {
                 </ul>
             </div>
             <div className="relative h-[500px] rounded-lg overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                     src="/doctor-photo.jpeg"
                     alt="Dr. Amiya Ballav Roy"
-                    fill
-                    className="object-cover object-center"
+                    className="w-full h-full object-cover object-center"
                 />
             </div>
           </div>
