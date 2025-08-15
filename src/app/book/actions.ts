@@ -7,7 +7,6 @@ import type { VerifyPaymentProofOutput } from '@/ai/flows/verify-payment-proof';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, getDoc, doc } from 'firebase/firestore';
 import type { Treatment } from '@/lib/types';
-import { auth } from '@/lib/firebase';
 
 
 const FormSchema = z.object({
@@ -16,6 +15,7 @@ const FormSchema = z.object({
     date: z.string({ required_error: 'Please select a date.' }),
     time: z.string({ required_error: 'Please select a time.' }),
     paymentProof: z.string().min(1, 'Payment proof is required.'),
+    patientId: z.string().min(1, 'User must be logged in.'),
 });
 
 export type State = {
@@ -25,6 +25,7 @@ export type State = {
         date?: string[];
         time?: string[];
         paymentProof?: string[];
+        patientId?: string[];
     };
     message?: string | null;
     success: boolean;
@@ -38,6 +39,7 @@ export async function createAppointment(prevState: State, formData: FormData): P
         date: formData.get('date'),
         time: formData.get('time'),
         paymentProof: formData.get('paymentProof'),
+        patientId: formData.get('patientId'),
     });
 
     if (!validatedFields.success) {
@@ -48,15 +50,7 @@ export async function createAppointment(prevState: State, formData: FormData): P
         };
     }
     
-    // Check for authenticated user
-    if (!auth.currentUser) {
-        return {
-            message: 'You must be logged in to book an appointment.',
-            success: false
-        };
-    }
-
-    const { name, treatmentId, date, time, paymentProof } = validatedFields.data;
+    const { name, treatmentId, date, time, paymentProof, patientId } = validatedFields.data;
 
     try {
         const verificationResult = await verifyPaymentProof({ paymentProof });
@@ -75,7 +69,7 @@ export async function createAppointment(prevState: State, formData: FormData): P
         
         await addDoc(collection(db, 'appointments'), {
             patientName: name,
-            patientId: auth.currentUser.uid, // Add user's UID
+            patientId: patientId, // Add user's UID
             treatmentId: treatmentId,
             treatmentName: selectedTreatment?.name || 'Unknown Treatment',
             date: new Date(date),

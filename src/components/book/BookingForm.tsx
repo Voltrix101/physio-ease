@@ -7,6 +7,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useActionState } from 'react';
+import Link from 'next/link';
 
 import { createAppointment, type State } from '@/app/book/actions';
 import type { Treatment } from '@/lib/types';
@@ -19,7 +20,10 @@ import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { BookingSuccess } from './BookingSuccess';
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -42,6 +46,7 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   const [step, setStep] = useState(1);
   const { toast } = useToast();
   const searchParams = useSearchParams();
+  const { user, loading: authLoading } = useAuth();
   
   // Memoize the search param to avoid re-reading from the hook on every render
   const defaultTreatmentId = useMemo(() => searchParams.get('treatment') || undefined, [searchParams]);
@@ -74,11 +79,21 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    if (!user) {
+        toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "You must be logged in to book an appointment.",
+        });
+        return;
+    }
+    
     const formData = new FormData();
     formData.append('name', data.name);
     formData.append('treatmentId', data.treatmentId);
     formData.append('date', data.date.toISOString());
     formData.append('time', data.time);
+    formData.append('patientId', user.uid);
     
     let proof = '';
     if (data.paymentProofType === 'text' && data.paymentProofText) {
@@ -172,7 +187,7 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
             <h3 className="text-xl font-headline">Step 3: Your Details & Payment Proof</h3>
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
-              <Input id="name" {...form.register('name')} placeholder="e.g. Jane Doe" />
+              <Input id="name" {...form.register('name')} placeholder="e.g. Jane Doe" defaultValue={user?.displayName || ''} />
               {form.formState.errors.name && <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>}
             </div>
             
@@ -196,14 +211,22 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
             )}
              {form.formState.errors.paymentProofFile && <p className="text-sm text-destructive">{form.formState.errors.paymentProofFile.message}</p>}
             
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center">
               <Button type="button" variant="outline" onClick={prevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
-              <Button type="submit" disabled={isPending} className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <Button type="submit" disabled={isPending || authLoading || !user} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Request Appointment
               </Button>
             </div>
-            {state.message && !state.success && <p className="text-sm text-destructive">{state.message}</p>}
+             {(!user && !authLoading) && (
+                <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                        You must be <Link href="/login" className="font-bold underline">logged in</Link> to book an appointment.
+                    </AlertDescription>
+                </Alert>
+            )}
+            {state.message && !state.success && <p className="text-sm text-destructive mt-2">{state.message}</p>}
           </div>
         )}
       </form>
