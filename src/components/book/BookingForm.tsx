@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -43,9 +43,11 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const defaultTreatmentId = searchParams.get('treatment') || undefined;
+  
+  const [isPending, startTransition] = useTransition();
 
   const initialState: State = { message: null, errors: {}, success: false };
-  const [state, formAction, isPending] = useActionState(createAppointment, initialState);
+  const [state, formAction] = useActionState(createAppointment, initialState);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -92,7 +94,10 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
       }
     }
     formData.append('paymentProof', proof);
-    formAction(formData);
+    
+    startTransition(() => {
+        formAction(formData);
+    });
   };
 
   if (state.success) {
