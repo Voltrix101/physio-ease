@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import type { Appointment, AppointmentStatus } from "@/lib/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,16 @@ const statusConfig = {
     completed: { label: "Completed", variant: "default", icon: CheckCircle, className: "bg-green-500 hover:bg-green-600" },
     rejected: { label: "Rejected", variant: "destructive", icon: XCircle },
 };
+
+function FormattedDate({ date }: { date: Date }) {
+  const [formattedDate, setFormattedDate] = useState('');
+
+  useEffect(() => {
+    setFormattedDate(date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }));
+  }, [date]);
+
+  return <>{formattedDate}</>;
+}
 
 export function AppointmentsTable({ appointments, onUpdate }: AppointmentsTableProps) {
   const { toast } = useToast();
@@ -56,7 +67,9 @@ export function AppointmentsTable({ appointments, onUpdate }: AppointmentsTableP
               <TableRow key={appointment.id}>
                 <TableCell className="font-medium">{appointment.patientName}</TableCell>
                 <TableCell>{appointment.treatmentName}</TableCell>
-                <TableCell>{appointment.date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</TableCell>
+                <TableCell>
+                  <FormattedDate date={appointment.date} />
+                </TableCell>
                 <TableCell>
                   {appointment.status === 'pending' && appointment.paymentVerification && (
                      <TooltipProvider>
