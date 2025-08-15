@@ -50,12 +50,12 @@ export default function Home() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative h-[80vh] flex items-center justify-center text-center text-white animate-fadeIn">
-          <video
-            autoPlay
-            muted
-            loop
+          <Image
+            src="https://static.vecteezy.com/system/resources/thumbnails/053/279/107/small_2x/physiotherapy-session-with-focus-on-rehabilitation-photo.jpeg"
+            alt="Physiotherapy session"
+            layout="fill"
+            objectFit="cover"
             className="absolute w-full h-full object-cover"
-            src="https://videos.pexels.com/video-files/8099895/8099895-hd_1920_1080_25fps.mp4"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30"></div>
           <div className="relative z-10 max-w-2xl animate-riseUp">
