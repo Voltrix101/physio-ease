@@ -1,5 +1,6 @@
 'use client';
 
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppointmentsList } from "./AppointmentsList";
 import { TreatmentsList } from "./TreatmentsList";
@@ -13,8 +14,17 @@ interface DashboardClientProps {
 }
 
 export function DashboardClient({ appointments }: DashboardClientProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'appointments';
+
+  const handleTabChange = (value: string) => {
+    router.push(`${pathname}?tab=${value}`, { scroll: false });
+  };
+
   return (
-    <Tabs defaultValue="appointments" className="w-full">
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
         <TabsTrigger value="appointments">
           <Calendar className="mr-2 h-4 w-4" />
