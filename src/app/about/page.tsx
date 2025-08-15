@@ -36,9 +36,8 @@ export default function AboutPage() {
                 <Image
                     src="/doctor-photo.png"
                     alt="Dr. Amiya Ballav Roy"
-                    layout="fill"
-                    objectFit="cover"
-                    className="object-center"
+                    fill
+                    className="object-cover object-center"
                 />
             </div>
           </div>
