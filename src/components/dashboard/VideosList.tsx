@@ -24,7 +24,7 @@ export function VideosList() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const q = query(collection(db, "videos"), orderBy("category"), orderBy("title"));
+    const q = query(collection(db, "videos"), orderBy("title"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const videosData = querySnapshot.docs.map(doc => ({
             id: doc.id,
