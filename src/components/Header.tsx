@@ -35,7 +35,6 @@ export function Header() {
     <>
       <Link href="/" className="hover:text-[#e0a96d] transition">Home</Link>
       <Link href="/about" className="hover:text-[#e0a96d] transition">About</Link>
-      <Link href="/services" className="hover:text-[#e0a96d] transition">Services</Link>
       <Link href="/products" className="hover:text-[#e0a96d] transition">Products</Link>
       <Link href="/videos" className="hover:text-[#e0a96d] transition">Videos</Link>
       {user && isAdmin && (

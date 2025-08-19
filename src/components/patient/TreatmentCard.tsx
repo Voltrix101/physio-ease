@@ -40,11 +40,6 @@ export function TreatmentCard({ treatment }: TreatmentCardProps) {
             </div>
         </div>
       </CardContent>
-      <CardFooter className="p-6 pt-0 mt-auto">
-        <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90 shadow-md transition-shadow hover:shadow-lg hover:glow-sm">
-          <Link href={`/book?treatment=${treatment.id}`}>Book This Service</Link>
-        </Button>
-      </CardFooter>
     </Card>
   );
 }
