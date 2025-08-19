@@ -49,12 +49,12 @@ export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: Treatm
   const dataAiHint = watch('dataAiHint');
 
   useEffect(() => {
+    // When the dataAiHint changes, check if it's a key in our map.
     if (dataAiHint && hintToImageMap[dataAiHint]) {
-        if (watch('imageUrl').includes('placehold.co')) {
-            setValue('imageUrl', hintToImageMap[dataAiHint]);
-        }
+        // If it is, update the imageUrl field with the corresponding Unsplash URL.
+        setValue('imageUrl', hintToImageMap[dataAiHint]);
     }
-  }, [dataAiHint, setValue, watch]);
+  }, [dataAiHint, setValue]);
 
 
   useEffect(() => {
