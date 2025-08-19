@@ -114,6 +114,7 @@ export function TreatmentsList() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
+                  <TableHead>Description</TableHead>
                   <TableHead>Duration (mins)</TableHead>
                   <TableHead>Price (₹)</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -123,6 +124,7 @@ export function TreatmentsList() {
                 {treatments.map((treatment) => (
                   <TableRow key={treatment.id}>
                     <TableCell className="font-medium">{treatment.name}</TableCell>
+                    <TableCell className="max-w-[300px] truncate">{treatment.description}</TableCell>
                     <TableCell>{treatment.duration}</TableCell>
                     <TableCell>₹{treatment.price}</TableCell>
                     <TableCell className="text-right">
