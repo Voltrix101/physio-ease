@@ -17,8 +17,8 @@ export function TreatmentCard({ treatment }: TreatmentCardProps) {
           <Image
             src={treatment.imageUrl}
             alt={treatment.name}
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{objectFit: 'cover'}}
             className="rounded-t-lg"
             data-ai-hint={treatment.dataAiHint}
           />

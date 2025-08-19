@@ -39,8 +39,8 @@ export default async function ProductsPage() {
                                     <Image
                                         src={product.imageUrl}
                                         alt={product.name}
-                                        layout="fill"
-                                        objectFit="cover"
+                                        fill
+                                        style={{objectFit: 'cover'}}
                                         data-ai-hint={product.dataAiHint}
                                     />
                                 </div>
