@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -43,6 +44,7 @@ export function PatientsList() {
           return {
             id: doc.id,
             ...data,
+            // Ensure date is always a JS Date object for consistent sorting
             date: (data.date as Timestamp).toDate(),
           } as Appointment;
         });
@@ -61,32 +63,29 @@ export function PatientsList() {
   }, [toast]);
   
   const patients = useMemo(() => {
-    const patientMap: { [key: string]: { name: string; appointments: Appointment[] } } = {};
+    const patientMap: { [key: string]: PatientRecord } = {};
+    
     appointments.forEach(app => {
-      if (!patientMap[app.patientId]) {
-        patientMap[app.patientId] = {
+      const patientId = app.patientId;
+      if (!patientMap[patientId]) {
+        patientMap[patientId] = {
+          id: patientId,
           name: app.patientName,
-          appointments: []
+          appointmentCount: 0,
+          lastVisit: app.date,
+          treatmentName: app.treatmentName,
         };
       }
-      patientMap[app.patientId].appointments.push(app);
+      
+      patientMap[patientId].appointmentCount += 1;
+      
+      if (app.date > patientMap[patientId].lastVisit) {
+        patientMap[patientId].lastVisit = app.date;
+        patientMap[patientId].treatmentName = app.treatmentName;
+      }
     });
 
-    const patientRecords: PatientRecord[] = Object.keys(patientMap).map(patientId => {
-      const patient = patientMap[patientId];
-      const sortedAppointments = [...patient.appointments].sort((a, b) => b.date.getTime() - a.date.getTime());
-      const lastAppointment = sortedAppointments[0];
-
-      return {
-        id: patientId,
-        name: patient.name,
-        appointmentCount: patient.appointments.length,
-        lastVisit: lastAppointment.date,
-        treatmentName: lastAppointment.treatmentName,
-      };
-    });
-
-    return patientRecords.sort((a, b) => b.lastVisit.getTime() - a.lastVisit.getTime());
+    return Object.values(patientMap).sort((a, b) => b.lastVisit.getTime() - a.lastVisit.getTime());
   }, [appointments]);
 
   const handleDeletePatient = async () => {
@@ -234,3 +233,5 @@ export function PatientsList() {
     </>
   );
 }
+
+    
