@@ -117,33 +117,20 @@
 /* Scrollbar Base */
 ::-webkit-scrollbar {
   width: 8px;
-  height: 8px;
-  opacity: 0; /* start hidden */
-  transition: opacity 0.4s ease-in-out;
-}
-
-/* Fade in when scrolling */
-html:hover::-webkit-scrollbar,
-body:hover::-webkit-scrollbar,
-*::-webkit-scrollbar:hover {
-  opacity: 1;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
   background: var(--scrollbar-track);
-  border-radius: 10px;
 }
 
 /* Thumb */
 ::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
   border-radius: 10px;
-  transition: filter 0.3s ease, opacity 0.3s ease;
 }
 
-/* Glow effect */
+/* Glow effect on hover */
 ::-webkit-scrollbar-thumb:hover {
   filter: brightness(1.25);
-  opacity: 0.9;
 }
