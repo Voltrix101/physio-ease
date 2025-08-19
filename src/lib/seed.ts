@@ -97,13 +97,13 @@ const categoriesData = [
 
 const videosData = [
     // Back Pain
-    { id: 'cat-cow', title: 'Cat-Cow Stretch', categoryId: 'back-pain', youtubeId: 'z915K14nL8s', duration: '2:15', tags: ['back', 'spine', 'flexibility'] },
-    { id: 'pelvic-tilts', title: 'Pelvic Tilts', categoryId: 'back-pain', youtubeId: 'z915K14nL8s', duration: '3:05', tags: ['back', 'core', 'stability'] },
+    { id: 'cat-cow', title: 'Cat-Cow Stretch', categoryId: 'back-pain', youtubeId: 'z915K14nL8s', duration: '2:15', tags: ['back', 'spine', 'flexibility'], description: 'A gentle stretch to improve spine mobility and relieve tension.' },
+    { id: 'pelvic-tilts', title: 'Pelvic Tilts', categoryId: 'back-pain', youtubeId: 'z915K14nL8s', duration: '3:05', tags: ['back', 'core', 'stability'], description: 'Strengthens core muscles and helps stabilize the lower back.' },
     // Knee Pain
-    { id: 'isometric-quads', title: 'Isometric Quads', categoryId: 'knee-pain', youtubeId: 'z915K14nL8s', duration: '3:42', tags: ['knee', 'rehab', 'strength'] },
-    { id: 'straight-leg-raises', title: 'Straight Leg Raises', categoryId: 'knee-pain', youtubeId: 'z915K14nL8s', duration: '4:10', tags: ['knee', 'strength'] },
+    { id: 'isometric-quads', title: 'Isometric Quads', categoryId: 'knee-pain', youtubeId: 'z915K14nL8s', duration: '3:42', tags: ['knee', 'rehab', 'strength'], description: 'Activates the quadriceps muscles without moving the knee joint.' },
+    { id: 'straight-leg-raises', title: 'Straight Leg Raises', categoryId: 'knee-pain', youtubeId: 'z915K14nL8s', duration: '4:10', tags: ['knee', 'strength'], description: 'Builds strength in the quads to better support the knee.' },
     // Neck & Shoulder
-    { id: 'neck-mobility-stretches', title: 'Neck Mobility Stretches', categoryId: 'neck-shoulder', youtubeId: 'z915K14nL8s', duration: '5:00', tags: ['neck', 'shoulder', 'stretch'] },
+    { id: 'neck-mobility-stretches', title: 'Neck Mobility Stretches', categoryId: 'neck-shoulder', youtubeId: 'z915K14nL8s', duration: '5:00', tags: ['neck', 'shoulder', 'stretch'], description: 'Increases range of motion and reduces stiffness in the neck and shoulders.' },
 ];
 
 export async function seedTreatments() {
@@ -124,7 +124,7 @@ export async function seedVideosAndCategories() {
   
   const catSnapshot = await getDocs(categoriesCollection);
   if (!catSnapshot.empty) {
-    console.log('Categories collection is not empty. Skipping seed.');
+    console.log('Collections are not empty. Skipping seed.');
     return;
   }
 
