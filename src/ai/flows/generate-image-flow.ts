@@ -3,7 +3,11 @@
 /**
  * @fileOverview A flow for generating images using an AI model.
  *
+ * This flow returns a data URI (base64 encoded image) which can be stored directly.
+ *
  * - generateImage - A function that handles the image generation process.
+ * - GenerateImageInput - The input type for the generateImage function.
+ * - GenerateImageOutput - The return type for the generateImage function.
  */
 
 import { ai } from '@/ai/genkit';
@@ -12,12 +16,12 @@ import { z } from 'genkit';
 const GenerateImageInputSchema = z.object({
   prompt: z.string().describe('The text prompt to generate the image from.'),
 });
-type GenerateImageInput = z.infer<typeof GenerateImageInputSchema>;
+export type GenerateImageInput = z.infer<typeof GenerateImageInputSchema>;
 
 const GenerateImageOutputSchema = z.object({
   imageUrl: z.string().describe('The data URI of the generated image.'),
 });
-type GenerateImageOutput = z.infer<typeof GenerateImageOutputSchema>;
+export type GenerateImageOutput = z.infer<typeof GenerateImageOutputSchema>;
 
 export async function generateImage(
   input: GenerateImageInput
@@ -40,10 +44,11 @@ const generateImageFlow = ai.defineFlow(
       },
     });
 
-    if (!media.url) {
+    if (!media?.url) {
       throw new Error('Image generation failed to return a URL.');
     }
 
+    // The flow now returns the full data URI.
     return { imageUrl: media.url };
   }
 );
