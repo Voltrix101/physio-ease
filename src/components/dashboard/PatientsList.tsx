@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -63,27 +62,38 @@ export function PatientsList() {
   }, [toast]);
   
   const patients = useMemo(() => {
-    const patientMap = new Map<string, PatientRecord>();
-    
+    // This logic is corrected to properly group and aggregate patient data.
+    const patientData: { [key: string]: { name: string; appointments: Appointment[] } } = {};
+
+    // Group appointments by patientId
     appointments.forEach(app => {
-        const existingPatient = patientMap.get(app.patientId);
-        if (!existingPatient || (app.date as Date) > existingPatient.lastVisit) {
-            patientMap.set(app.patientId, {
-                id: app.patientId,
-                name: app.patientName,
-                lastVisit: app.date as Date,
-                treatmentName: app.treatmentName,
-                appointmentCount: (existingPatient?.appointmentCount || 0) + 1
-            });
-        } else {
-             patientMap.set(app.patientId, {
-                ...existingPatient,
-                appointmentCount: existingPatient.appointmentCount + 1,
-            });
-        }
+      if (!patientData[app.patientId]) {
+        patientData[app.patientId] = {
+          name: app.patientName,
+          appointments: []
+        };
+      }
+      patientData[app.patientId].appointments.push(app);
     });
 
-    return Array.from(patientMap.values());
+    // Create the final patient records
+    const patientRecords: PatientRecord[] = Object.keys(patientData).map(patientId => {
+      const patient = patientData[patientId];
+      // Sort appointments to find the most recent one
+      const sortedAppointments = [...patient.appointments].sort((a, b) => (b.date as Date).getTime() - (a.date as Date).getTime());
+      const lastAppointment = sortedAppointments[0];
+
+      return {
+        id: patientId,
+        name: patient.name,
+        appointmentCount: patient.appointments.length,
+        lastVisit: lastAppointment.date as Date,
+        treatmentName: lastAppointment.treatmentName,
+      };
+    });
+
+    // Sort patients by their last visit date (most recent first)
+    return patientRecords.sort((a, b) => b.lastVisit.getTime() - a.lastVisit.getTime());
   }, [appointments]);
 
 
