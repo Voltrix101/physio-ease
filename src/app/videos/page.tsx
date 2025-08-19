@@ -78,36 +78,31 @@ export default function VideosPage() {
               <section className="animate-fadeUp">
                  {!currentVideo && <h3 className="text-2xl font-headline text-primary mb-6 text-center">Click a video to play</h3>}
                  {currentVideo && <h3 className="text-2xl font-headline text-primary mb-6 text-center">More Exercises</h3>}
-                <Carousel opts={{ align: "start", loop: videos.length > 3 }} className="w-full">
-                  <CarouselContent className="-ml-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {videos.map((video) => (
-                      <CarouselItem key={video.id} className="pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
-                        <div
-                          onClick={() => setCurrentVideo(video)}
-                          className="group cursor-pointer overflow-hidden rounded-lg shadow-lg border border-border/50 hover:border-primary transition-all duration-300 transform hover:-translate-y-1 bg-card"
-                        >
-                          <div className="relative aspect-video">
-                            <Image
-                              src={`https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`}
-                              alt={video.title}
-                              fill
-                              className="object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
-                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <PlayCircle className="h-12 w-12 text-white/80" />
-                            </div>
-                          </div>
-                          <div className="p-4">
-                            <h4 className="font-semibold truncate text-foreground" title={video.title}>{video.title}</h4>
-                            <p className="text-sm text-muted-foreground">{video.category || 'General'}</p>
+                      <div
+                        key={video.id}
+                        onClick={() => setCurrentVideo(video)}
+                        className="group cursor-pointer overflow-hidden rounded-lg shadow-lg border border-border/50 hover:border-primary transition-all duration-300 transform hover:-translate-y-1 bg-card"
+                      >
+                        <div className="relative aspect-video">
+                          <Image
+                            src={`https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`}
+                            alt={video.title}
+                            fill
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <PlayCircle className="h-12 w-12 text-white/80" />
                           </div>
                         </div>
-                      </CarouselItem>
+                        <div className="p-4">
+                          <h4 className="font-semibold truncate text-foreground" title={video.title}>{video.title}</h4>
+                          <p className="text-sm text-muted-foreground">{video.category || 'General'}</p>
+                        </div>
+                      </div>
                     ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="hidden sm:flex" />
-                  <CarouselNext className="hidden sm:flex" />
-                </Carousel>
+                </div>
               </section>
             )}
           </div>
@@ -120,4 +115,3 @@ export default function VideosPage() {
       </div>
     );
 }
-
