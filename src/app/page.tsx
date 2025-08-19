@@ -79,9 +79,6 @@ export default function Home() {
           <p className="max-w-2xl mx-auto mb-6 text-muted-foreground">
             Specialist in Dry Needling, Taping, and Dry Cupping techniques with a focus on holistic pain management and recovery.
           </p>
-           <Button onClick={handleBookAppointmentClick} size="lg" className="bg-[#e0a96d] text-black px-6 py-3 rounded-lg hover:bg-[#d18f50] hover:scale-105 transform transition">
-              Book Appointment
-            </Button>
         </section>
         
         {/* Services Section */}
