@@ -1,24 +1,93 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlusCircle, MoreHorizontal, Download } from 'lucide-react';
+import { MoreHorizontal, Download, Loader2 } from 'lucide-react';
+import type { Appointment } from '@/lib/types';
+import { db } from '@/lib/firebase';
+import { collection, query, orderBy, onSnapshot, type Timestamp } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
-const mockPatients = [
-  { id: '1', name: 'Rohan Sharma', age: 34, lastVisit: '2024-05-10', ongoingTreatments: 'Lower Back Pain' },
-  { id: '2', name: 'Priya Singh', age: 28, lastVisit: '2024-05-12', ongoingTreatments: 'Knee Physiotherapy' },
-  { id: '3', name: 'Amit Patel', age: 45, lastVisit: '2024-04-28', ongoingTreatments: 'Shoulder Impingement' },
-  { id: '4', name: 'Sunita Devi', age: 62, lastVisit: '2024-05-05', ongoingTreatments: 'Arthritis Management' },
-];
+interface PatientRecord {
+  id: string; // patientId
+  name: string;
+  lastVisit: Date;
+  treatmentName: string;
+  appointmentCount: number;
+}
+
+
+function FormattedDate({ date }: { date: Date | Timestamp }) {
+  const [formattedDate, setFormattedDate] = useState('');
+
+  useEffect(() => {
+    // Should run only on the client
+    const jsDate = date instanceof Date ? date : date.toDate();
+    setFormattedDate(new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(jsDate));
+  }, [date]);
+
+  return <>{formattedDate}</>;
+}
+
 
 export function PatientsList() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const { toast } = useToast();
 
-  const filteredPatients = mockPatients.filter(patient =>
+  useEffect(() => {
+    const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const appointmentsData = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            date: (doc.data().date as Timestamp).toDate(),
+        } as Appointment));
+        setAppointments(appointmentsData);
+        setLoading(false);
+    }, (error) => {
+        console.error("Error fetching patient data: ", error);
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Could not fetch patient data.'
+        });
+        setLoading(false);
+    });
+    return () => unsubscribe();
+  }, [toast]);
+  
+  const patients = useMemo(() => {
+    const patientMap = new Map<string, PatientRecord>();
+    
+    appointments.forEach(app => {
+        const existingPatient = patientMap.get(app.patientId);
+        if (!existingPatient || (app.date as Date) > existingPatient.lastVisit) {
+            patientMap.set(app.patientId, {
+                id: app.patientId,
+                name: app.patientName,
+                lastVisit: app.date as Date,
+                treatmentName: app.treatmentName,
+                appointmentCount: (existingPatient?.appointmentCount || 0) + 1
+            });
+        } else {
+             patientMap.set(app.patientId, {
+                ...existingPatient,
+                appointmentCount: existingPatient.appointmentCount + 1,
+            });
+        }
+    });
+
+    return Array.from(patientMap.values());
+  }, [appointments]);
+
+
+  const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -27,7 +96,7 @@ export function PatientsList() {
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <CardTitle>Patients</CardTitle>
-          <CardDescription>Manage your patient records.</CardDescription>
+          <CardDescription>Manage your patient records based on their appointments.</CardDescription>
         </div>
         <div className="flex w-full sm:w-auto gap-2">
            <Input
@@ -43,34 +112,48 @@ export function PatientsList() {
         </div>
       </CardHeader>
       <CardContent>
+       {loading ? (
+         <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+       ) : (
         <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Age</TableHead>
+                <TableHead>Total Appointments</TableHead>
                 <TableHead>Last Visit</TableHead>
-                <TableHead>Ongoing Treatments</TableHead>
+                <TableHead>Last Treatment</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredPatients.map(patient => (
-                <TableRow key={patient.id}>
-                  <TableCell className="font-medium">{patient.name}</TableCell>
-                  <TableCell>{patient.age}</TableCell>
-                  <TableCell>{patient.lastVisit}</TableCell>
-                  <TableCell>{patient.ongoingTreatments}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+              {filteredPatients.length === 0 ? (
+                <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                        No patients found.
+                    </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredPatients.map(patient => (
+                    <TableRow key={patient.id}>
+                    <TableCell className="font-medium">{patient.name}</TableCell>
+                    <TableCell>{patient.appointmentCount}</TableCell>
+                    <TableCell><FormattedDate date={patient.lastVisit} /></TableCell>
+                    <TableCell>{patient.treatmentName}</TableCell>
+                    <TableCell className="text-right">
+                        <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </TableCell>
+                    </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
+       )}
       </CardContent>
     </Card>
   );
