@@ -2,13 +2,13 @@
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
 import { Header } from '@/components/Header';
 import { DashboardClient } from '@/components/dashboard/DashboardClient';
 import { Loader2 } from 'lucide-react';
 
-function DashboardContent() {
+function DashboardPageContent() {
   const { user, loading: authLoading, isAdmin } = useAuth();
   const router = useRouter();
 
@@ -34,7 +34,6 @@ function DashboardContent() {
   );
 }
 
-// Use Suspense to handle the query parameter access on the client side
 export default function DashboardPage() {
     return (
         <Suspense fallback={
@@ -42,7 +41,7 @@ export default function DashboardPage() {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         }>
-            <DashboardContent />
+            <DashboardPageContent />
         </Suspense>
     );
 }
