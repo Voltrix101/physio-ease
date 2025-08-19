@@ -8,11 +8,12 @@ import { Header } from '@/components/Header';
 import { TreatmentCarousel } from '@/components/patient/TreatmentCarousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import type { Treatment } from '@/lib/types';
+import { collection, getDocs, orderBy, query, onSnapshot } from 'firebase/firestore';
+import type { Treatment, Testimonial } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 async function getTreatments(): Promise<Treatment[]> {
@@ -25,6 +26,8 @@ async function getTreatments(): Promise<Treatment[]> {
 
 export default function Home() {
   const [treatments, setTreatments] = useState<Treatment[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
   const { user } = useAuth();
   const router = useRouter();
 
@@ -38,6 +41,18 @@ export default function Home() {
         }
     }
     fetchTreatments();
+
+    const q = query(collection(db, "testimonials"), orderBy("name"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const testimonialsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Testimonial));
+      setTestimonials(testimonialsData);
+      setLoadingTestimonials(false);
+    });
+
+    return () => unsubscribe();
   }, []);
   
   const handleBookAppointmentClick = () => {
@@ -53,7 +68,7 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative h-[70vh] md:h-[80vh] flex items-center justify-center text-center text-white animate-fadeIn">
+        <section className="relative h-[70vh] flex items-center justify-center text-center text-white animate-fadeIn md:h-[80vh]">
           <Image
             src="https://plus.unsplash.com/premium_photo-1663012948067-0478e4f9d9c6?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Physiotherapy session"
@@ -63,8 +78,8 @@ export default function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30"></div>
           <div className="relative z-10 max-w-2xl px-4 animate-riseUp">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-headline mb-4 tracking-wide text-white">Restore. Revive. Renew.</h1>
-            <p className="text-lg md:text-xl mb-6 text-white/90">Personalized physiotherapy care by Dr. Amiya Ballav Roy</p>
+            <h1 className="text-4xl font-headline mb-4 tracking-wide text-white sm:text-5xl md:text-6xl">Restore. Revive. Renew.</h1>
+            <p className="text-lg mb-6 text-white/90 md:text-xl">Personalized physiotherapy care by Dr. Amiya Ballav Roy</p>
             <Button onClick={handleBookAppointmentClick} size="lg" variant="accent" className="px-8 py-4 text-lg font-medium">
               Book Appointment
             </Button>
@@ -72,9 +87,9 @@ export default function Home() {
         </section>
 
         {/* Doctor Profile Section */}
-        <section className="bg-background py-16 px-4 md:px-6 text-center animate-fadeUp">
+        <section className="bg-background py-16 px-4 text-center animate-fadeUp md:px-6">
           <Image src="https://i.postimg.cc/CxpzR9S8/Whats-App-Image-2025-08-15-at-23-45-01.jpg" alt="Dr. Amiya Ballav Roy" width={160} height={160} className="w-32 h-32 md:w-40 md:h-40 rounded-full mx-auto object-cover shadow-lg mb-6 hover:scale-105 transition"/>
-          <h2 className="text-3xl md:text-4xl font-headline mb-2 text-deep-highlight">Dr. Amiya Ballav Roy</h2>
+          <h2 className="text-3xl font-headline mb-2 text-deep-highlight md:text-4xl">Dr. Amiya Ballav Roy</h2>
           <p className="text-primary font-medium mb-4">CDNT, CKTP, CCTS | Physiotherapist @ Pain Manage Clinic</p>
           <p className="max-w-3xl mx-auto mb-6 text-muted-foreground">
             Specialist in Dry Needling, Taping, and Dry Cupping techniques with a focus on holistic pain management and recovery.
@@ -82,9 +97,9 @@ export default function Home() {
         </section>
         
         {/* Services Section */}
-        <section id="services" className="w-full py-16 md:py-24 bg-secondary">
+        <section id="services" className="w-full py-16 bg-secondary md:py-24">
           <div className="container px-4 md:px-6">
-            <h2 className="text-3xl md:text-4xl font-headline tracking-tight text-center mb-12 text-deep-highlight">Our Services</h2>
+            <h2 className="text-3xl font-headline tracking-tight text-center mb-12 text-deep-highlight md:text-4xl">Our Services</h2>
             <TreatmentCarousel treatments={treatments} />
              <div className="mt-12 text-center">
                 <Button asChild variant="outline">
@@ -95,24 +110,34 @@ export default function Home() {
         </section>
 
         {/* Testimonials Section */}
-        <section id="testimonials" className="w-full py-16 md:py-24 bg-background">
+        <section id="testimonials" className="w-full py-16 bg-background md:py-24">
             <div className="container px-4 md:px-6">
-                 <h2 className="text-3xl md:text-4xl font-headline tracking-tight text-center mb-12 text-deep-highlight">Patient Testimonials</h2>
-                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {[
-                      {name: "Rohan S.", quote: "A wonderful experience. Dr. Amiya is very knowledgeable and caring. My back pain is completely gone!"},
-                      {name: "Priya K.", quote: "The dry needling therapy worked wonders for my shoulder. Highly recommended clinic."},
-                      {name: "Amit G.", quote: "Professional, clean, and effective. The best physiotherapy I've had in Kolkata."}
-                    ].map((testimonial, i) => (
-                        <Card key={i} className="bg-card border-l-4 border-accent shadow-md dark:card-shadow transition-all hover:shadow-xl hover:-translate-y-1">
+                 <h2 className="text-3xl font-headline tracking-tight text-center mb-12 text-deep-highlight md:text-4xl">Patient Testimonials</h2>
+                 <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    {loadingTestimonials ? (
+                      Array.from({ length: 3 }).map((_, i) => (
+                        <Card key={i} className="bg-card border-l-4 border-accent shadow-md dark:card-shadow">
                             <CardHeader>
-                                <CardTitle className="font-body text-xl text-primary">{testimonial.name}</CardTitle>
+                               <Skeleton className="h-6 w-1/2" />
                             </CardHeader>
                             <CardContent>
-                                <p className="text-muted-foreground italic">"{testimonial.quote}"</p>
+                                <Skeleton className="h-4 w-full mb-2" />
+                                <Skeleton className="h-4 w-5/6" />
                             </CardContent>
                         </Card>
-                    ))}
+                      ))
+                    ) : (
+                      testimonials.map((testimonial) => (
+                          <Card key={testimonial.id} className="bg-card border-l-4 border-accent shadow-md dark:card-shadow transition-all hover:shadow-xl hover:-translate-y-1">
+                              <CardHeader>
+                                  <CardTitle className="font-body text-xl text-primary">{testimonial.name}</CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                  <p className="text-muted-foreground italic">"{testimonial.quote}"</p>
+                              </CardContent>
+                          </Card>
+                      ))
+                    )}
                  </div>
             </div>
         </section>

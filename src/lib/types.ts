@@ -31,10 +31,16 @@ export interface Video {
     category?: string;
 }
 
+export interface Testimonial {
+  id: string;
+  name: string;
+  quote: string;
+}
+
 export type AppointmentStatus = 'pending' | 'confirmed' | 'rejected' | 'completed';
 
 export interface Appointment {
-  id: string;
+  id:string;
   patientName: string;
   patientId: string; // ID of the authenticated user
   treatmentId: string;
