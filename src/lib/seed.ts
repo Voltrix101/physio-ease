@@ -1,4 +1,5 @@
-import { collection, writeBatch, getDocs } from 'firebase/firestore';
+
+import { collection, writeBatch, getDocs, doc } from 'firebase/firestore';
 import { db } from './firebase';
 
 const treatmentsData = [
@@ -45,7 +46,7 @@ const treatmentsData = [
     price: 300,
     duration: 15,
     imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba9996a?q=80&w=1470&auto=format&fit=crop",
-    dataAiHint": "physiotherapy hot cold therapy"
+    dataAiHint: "physiotherapy hot cold therapy"
   },
   {
     id: "kinesio-taping",
@@ -72,7 +73,7 @@ const treatmentsData = [
     price: 800,
     duration: 25,
     imageUrl: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?q=80&w=1587&auto=format&fit=crop",
-    dataAiHint": "physiotherapy dry needling acupuncture"
+    dataAiHint: "physiotherapy dry needling acupuncture"
   },
   {
     id: "neurological-rehab",
@@ -81,7 +82,7 @@ const treatmentsData = [
     price: 900,
     duration: 45,
     imageUrl: "https://images.unsplash.com/photo-1581092921532-7227429d35a8?q=80&w=1470&auto=format&fit=crop",
-    dataAiHint": "physiotherapy neurological rehab"
+    dataAiHint: "physiotherapy neurological rehab"
   }
 ];
 
