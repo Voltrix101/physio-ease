@@ -5,19 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MoreHorizontal, Download, Loader2 } from 'lucide-react';
-import type { Appointment } from '@/lib/types';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { MoreHorizontal, Download, Loader2, Trash2, ShieldAlert } from 'lucide-react';
+import type { Appointment, PatientRecord } from '@/lib/types';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, onSnapshot, type Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, type Timestamp, writeBatch, where, getDocs } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
-
-interface PatientRecord {
-  id: string; // patientId
-  name: string;
-  lastVisit: Date;
-  treatmentName: string;
-  appointmentCount: number;
-}
 
 
 function FormattedDate({ date }: { date: Date | Timestamp }) {
@@ -37,6 +31,8 @@ export function PatientsList() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState<PatientRecord | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -47,7 +43,7 @@ export function PatientsList() {
           return {
             id: doc.id,
             ...data,
-            date: (data.date as Timestamp).toDate(), // Correctly convert Timestamp to Date
+            date: (data.date as Timestamp).toDate(),
           } as Appointment;
         });
         setAppointments(appointmentsData);
@@ -65,10 +61,7 @@ export function PatientsList() {
   }, [toast]);
   
   const patients = useMemo(() => {
-    // This logic is corrected to properly group and aggregate patient data.
     const patientMap: { [key: string]: { name: string; appointments: Appointment[] } } = {};
-
-    // 1. Group appointments by patientId
     appointments.forEach(app => {
       if (!patientMap[app.patientId]) {
         patientMap[app.patientId] = {
@@ -79,10 +72,8 @@ export function PatientsList() {
       patientMap[app.patientId].appointments.push(app);
     });
 
-    // 2. Create the final patient records from the map
     const patientRecords: PatientRecord[] = Object.keys(patientMap).map(patientId => {
       const patient = patientMap[patientId];
-      // Sort appointments to find the most recent one
       const sortedAppointments = [...patient.appointments].sort((a, b) => b.date.getTime() - a.date.getTime());
       const lastAppointment = sortedAppointments[0];
 
@@ -95,9 +86,40 @@ export function PatientsList() {
       };
     });
 
-    // 3. Sort patients by their last visit date (most recent first)
     return patientRecords.sort((a, b) => b.lastVisit.getTime() - a.lastVisit.getTime());
   }, [appointments]);
+
+  const handleDeletePatient = async () => {
+    if (!patientToDelete) return;
+
+    setIsDeleting(true);
+    try {
+        const appointmentsQuery = query(collection(db, 'appointments'), where('patientId', '==', patientToDelete.id));
+        const querySnapshot = await getDocs(appointmentsQuery);
+        
+        const batch = writeBatch(db);
+        querySnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+
+        await batch.commit();
+
+        toast({
+            title: 'Patient Deleted',
+            description: `All records for ${patientToDelete.name} have been removed.`,
+        });
+    } catch (error) {
+        console.error('Error deleting patient records:', error);
+        toast({
+            variant: 'destructive',
+            title: 'Deletion Failed',
+            description: 'Could not delete patient records. Please try again.',
+        });
+    } finally {
+        setIsDeleting(false);
+        setPatientToDelete(null);
+    }
+  };
 
 
   const filteredPatients = patients.filter(patient =>
@@ -105,6 +127,7 @@ export function PatientsList() {
   );
 
   return (
+    <>
     <Card>
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -156,9 +179,23 @@ export function PatientsList() {
                     <TableCell><FormattedDate date={patient.lastVisit} /></TableCell>
                     <TableCell>{patient.treatmentName}</TableCell>
                     <TableCell className="text-right">
-                        <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                       <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem 
+                                    className="text-destructive"
+                                    onClick={() => setPatientToDelete(patient)}
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete Patient
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </TableCell>
                     </TableRow>
                 ))
@@ -169,5 +206,31 @@ export function PatientsList() {
        )}
       </CardContent>
     </Card>
+    
+    <AlertDialog open={!!patientToDelete} onOpenChange={(open) => !open && setPatientToDelete(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                    <ShieldAlert className="h-6 w-6 text-destructive" />
+                    Are you sure?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                    This will permanently delete all appointment records for <strong>{patientToDelete?.name}</strong>. This action cannot be undone.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setPatientToDelete(null)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                    onClick={handleDeletePatient} 
+                    disabled={isDeleting}
+                    className="bg-destructive hover:bg-destructive/90"
+                >
+                    {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Yes, delete patient
+                </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

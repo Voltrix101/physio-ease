@@ -52,3 +52,12 @@ export interface Appointment {
   paymentVerification?: VerifyPaymentProofOutput;
   createdAt: Timestamp;
 }
+
+
+export interface PatientRecord {
+  id: string; // patientId
+  name: string;
+  lastVisit: Date;
+  treatmentName: string;
+  appointmentCount: number;
+}
