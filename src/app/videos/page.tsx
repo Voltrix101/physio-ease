@@ -24,9 +24,6 @@ export default function VideosPage() {
                 const snapshot = await getDocs(q);
                 const allVideos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Video));
                 setVideos(allVideos);
-                if (allVideos.length > 0) {
-                    setCurrentVideo(allVideos[0]);
-                }
             } catch (error) {
                 console.error("Error fetching videos:", error);
             } finally {
@@ -79,7 +76,8 @@ export default function VideosPage() {
 
             {videos.length > 0 && (
               <section className="animate-fadeUp">
-                <h3 className="text-2xl font-headline text-primary mb-6 text-center">More Exercises</h3>
+                 {!currentVideo && <h3 className="text-2xl font-headline text-primary mb-6 text-center">Click a video to play</h3>}
+                 {currentVideo && <h3 className="text-2xl font-headline text-primary mb-6 text-center">More Exercises</h3>}
                 <Carousel opts={{ align: "start", loop: videos.length > 3 }} className="w-full">
                   <CarouselContent className="-ml-4">
                     {videos.map((video) => (
@@ -122,3 +120,4 @@ export default function VideosPage() {
       </div>
     );
 }
+
