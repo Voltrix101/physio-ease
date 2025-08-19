@@ -65,7 +65,7 @@ export default function Home() {
           <div className="relative z-10 max-w-2xl px-4 animate-riseUp">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-headline mb-4 tracking-wide text-white">Restore. Revive. Renew.</h1>
             <p className="text-lg md:text-xl mb-6 text-white/90">Personalized physiotherapy care by Dr. Amiya Ballav Roy</p>
-            <Button onClick={handleBookAppointmentClick} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-8 py-4 text-lg font-medium hover:scale-105 transform transition">
+            <Button onClick={handleBookAppointmentClick} size="lg" variant="accent" className="px-8 py-4 text-lg font-medium">
               Book Appointment
             </Button>
           </div>
@@ -82,7 +82,7 @@ export default function Home() {
         </section>
         
         {/* Services Section */}
-        <section id="services" className="w-full py-16 md:py-24 bg-secondary/50">
+        <section id="services" className="w-full py-16 md:py-24 bg-secondary">
           <div className="container px-4 md:px-6">
             <h2 className="text-3xl md:text-4xl font-headline tracking-tight text-center mb-12 text-deep-highlight">Our Services</h2>
             <TreatmentCarousel treatments={treatments} />
@@ -104,7 +104,7 @@ export default function Home() {
                       {name: "Priya K.", quote: "The dry needling therapy worked wonders for my shoulder. Highly recommended clinic."},
                       {name: "Amit G.", quote: "Professional, clean, and effective. The best physiotherapy I've had in Kolkata."}
                     ].map((testimonial, i) => (
-                        <Card key={i} className="bg-card border-l-4 border-accent shadow-md transition-all hover:shadow-xl hover:-translate-y-1">
+                        <Card key={i} className="bg-card border-l-4 border-accent shadow-md dark:card-shadow transition-all hover:shadow-xl hover:-translate-y-1">
                             <CardHeader>
                                 <CardTitle className="font-body text-xl text-primary">{testimonial.name}</CardTitle>
                             </CardHeader>
@@ -118,7 +118,7 @@ export default function Home() {
         </section>
 
       </main>
-      <footer className="bg-deep-highlight text-deep-highlight-foreground py-6 border-t border-deep-highlight/50">
+      <footer className="bg-deep-highlight dark:bg-secondary text-deep-highlight-foreground py-6 border-t border-deep-highlight/50 dark:border-border">
         <div className="container text-center text-sm px-4 md:px-6">
           © {new Date().getFullYear()} PhysioEase Clinic. All rights reserved.
         </div>

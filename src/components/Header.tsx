@@ -32,23 +32,23 @@ export function Header() {
     }
   };
 
-  const NavLinks = () => (
+  const NavLinks = ({ inSheet }: { inSheet?: boolean }) => (
     <>
-      <Link href="/" className="hover:text-[#e0a96d] transition">Home</Link>
-      <Link href="/services" className="hover:text-[#e0a96d] transition">Services</Link>
-      <Link href="/about" className="hover:text-[#e0a96d] transition">About</Link>
-      <Link href="/products" className="hover:text-[#e0a96d] transition">Products</Link>
-      <Link href="/videos" className="hover:text-[#e0a96d] transition">Videos</Link>
+      <Link href="/" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>Home</Link>
+      <Link href="/services" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>Services</Link>
+      <Link href="/about" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>About</Link>
+      <Link href="/products" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>Products</Link>
+      <Link href="/videos" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>Videos</Link>
       {user && isAdmin && (
-        <Link href="/dashboard" className="hover:text-[#e0a96d] transition">Dashboard</Link>
+        <Link href="/dashboard" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>Dashboard</Link>
       )}
     </>
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#2e4a3f] text-white px-6 py-4 flex justify-between items-center shadow-md animate-slideDown">
+    <header className="sticky top-0 z-50 w-full bg-[#2e4a3f] text-white dark:bg-[#121212]/80 dark:backdrop-blur-sm px-6 py-4 flex justify-between items-center shadow-md dark:shadow-black/20 animate-slideDown">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-          <Stethoscope className="h-6 w-6 text-[#e0a96d]" />
+          <Stethoscope className="h-6 w-6 text-accent" />
           <span className="font-headline text-2xl tracking-wide text-white">Pain Manage Clinic</span>
         </Link>
         
@@ -62,13 +62,13 @@ export function Header() {
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="bg-[#2e4a3f] text-white border-l-0">
+              <SheetContent side="right" className="bg-[#2e4a3f] dark:bg-[#121212] text-white border-l-0">
                   <SheetHeader>
                     <SheetTitle className="text-white font-headline text-2xl tracking-wide text-left">Menu</SheetTitle>
                   </SheetHeader>
                   <nav className="flex flex-col gap-6 text-lg mt-8">
-                    <SheetClose asChild><NavLinks /></SheetClose>
-                    <Button onClick={handleBookAppointmentClick} className="bg-[#e0a96d] text-black px-4 py-2 rounded-lg hover:bg-[#d18f50] hover:scale-105 transform transition mt-4">
+                    <SheetClose asChild><NavLinks inSheet={true} /></SheetClose>
+                    <Button onClick={handleBookAppointmentClick} variant="accent" className="mt-4">
                       Book Appointment
                     </Button>
                      {user && (
@@ -85,13 +85,13 @@ export function Header() {
             <nav className="hidden md:flex items-center gap-6 text-sm">
               <NavLinks />
             </nav>
-            <div className="flex items-center gap-2">
-                <Button onClick={handleBookAppointmentClick} className="bg-[#e0a96d] text-black px-4 py-2 rounded-lg hover:bg-[#d18f50] hover:scale-105 transform transition">
+            <div className="flex items-center gap-4">
+                <Button onClick={handleBookAppointmentClick} variant="accent">
                     Book Appointment
                 </Button>
                  <ThemeToggle />
                 {!loading && user && (
-                     <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout" className="hover:bg-white/10">
+                     <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout" className="hover:bg-white/10 dark:hover:bg-white/5">
                         <LogOut className="h-5 w-5" />
                     </Button>
                 )}

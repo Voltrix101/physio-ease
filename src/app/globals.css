@@ -39,28 +39,36 @@
   }
 
   .dark {
-    /* Keeping dark mode similar for now, can be updated later */
-    --background: 155 24% 10%;
-    --foreground: 40 33% 98%;
-    --card: 155 24% 10%;
-    --card-foreground: 40 33% 98%;
-    --popover: 155 24% 10%;
-    --popover-foreground: 40 33% 98%;
+    --background: 240 10% 4%; /* #121212 */
+    --foreground: 0 0% 98%; /* #fafafa */
+
+    --card: 145 15% 12%; /* #1b1f1b */
+    --card-foreground: 0 0% 96%; /* #f5f5f5 */
+
+    --popover: 240 10% 4%;
+    --popover-foreground: 0 0% 98%;
+
     --primary: 175 24% 55%;
-    --primary-foreground: 40 33% 99%;
-    --secondary: 155 20% 15%;
-    --secondary-foreground: 40 33% 98%;
-    --muted: 155 20% 20%;
-    --muted-foreground: 40 10% 60%;
-    --accent: 35 63% 65%;
-    --accent-foreground: 155 24% 10%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 4% 11%; /* #1b1b1b */
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 145 15% 15%;
+    --muted-foreground: 0 0% 79%; /* #c9c9c9 */
+    
+    --accent: 35 100% 65%; /* #ffb84d - Brighter Gold */
+    --accent-foreground: 240 10% 4%;
+
     --destructive: 5 82% 76%;
-    --destructive-foreground: 40 33% 99%;
-    --deep-highlight: 155 24% 24%;
-    --deep-highlight-foreground: 40 33% 95%;
-    --border: 155 20% 25%;
-    --input: 155 20% 22%;
-    --ring: 175 24% 55%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --deep-highlight: 175 24% 70%; /* Lighter teal for dark mode */
+    --deep-highlight-foreground: 0 0% 98%;
+
+    --border: 145 15% 20%;
+    --input: 145 15% 20%;
+    --ring: 35 100% 65%;
   }
 }
 
@@ -77,6 +85,13 @@
     @apply font-headline text-primary;
   }
 }
+
+@layer components {
+    .dark .card-shadow {
+        @apply shadow-[0_4px_15px_rgba(0,0,0,0.4)];
+    }
+}
+
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

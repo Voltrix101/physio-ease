@@ -12,7 +12,7 @@ interface TreatmentCardProps {
 
 export function TreatmentCard({ treatment }: TreatmentCardProps) {
   return (
-    <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 rounded-lg border bg-card">
+    <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 rounded-lg border bg-card dark:card-shadow">
       <CardHeader className="p-0">
         <div className="relative h-48 w-full">
           <Image
@@ -26,7 +26,7 @@ export function TreatmentCard({ treatment }: TreatmentCardProps) {
         </div>
         <div className="p-6">
           <CardTitle className="text-xl font-headline text-primary">{treatment.name}</CardTitle>
-          <CardDescription className="pt-2 text-base">{treatment.description}</CardDescription>
+          <CardDescription className="pt-2 text-base text-muted-foreground">{treatment.description}</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="flex-grow p-6 pt-0">
@@ -42,7 +42,7 @@ export function TreatmentCard({ treatment }: TreatmentCardProps) {
         </div>
       </CardContent>
        <CardFooter className="p-6 pt-0 mt-auto">
-        <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+        <Button asChild className="w-full" variant="accent">
           <Link href={`/book?treatment=${treatment.id}`}>Book Now</Link>
         </Button>
       </CardFooter>
