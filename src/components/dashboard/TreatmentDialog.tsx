@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import type { Treatment } from '@/lib/types';
-import { generateImage } from '@/ai/flows/generate-image-flow';
+import { generateAndUploadImage } from '@/ai/flows/generate-and-upload-image-flow';
 import { Loader2, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -68,7 +68,7 @@ export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: Treatm
       }
       setIsGenerating(true);
       try {
-        const result = await generateImage({ prompt: watchedPrompt });
+        const result = await generateAndUploadImage({ prompt: watchedPrompt });
         setValue('imageUrl', result.imageUrl, { shouldValidate: true });
         toast({ title: 'Image Generated!', description: 'The image has been successfully generated and updated.' });
       } catch (error) {

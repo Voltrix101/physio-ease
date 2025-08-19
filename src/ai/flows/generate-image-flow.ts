@@ -4,8 +4,6 @@
  * @fileOverview A flow for generating images using an AI model.
  *
  * - generateImage - A function that handles the image generation process.
- * - GenerateImageInput - The input type for the generateImage function.
- * - GenerateImageOutput - The return type for the generateImage function.
  */
 
 import { ai } from '@/ai/genkit';

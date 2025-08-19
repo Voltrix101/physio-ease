@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Product } from '@/lib/types';
-import { generateImage } from '@/ai/flows/generate-image-flow';
+import { generateAndUploadImage } from '@/ai/flows/generate-and-upload-image-flow';
 import { Loader2, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -64,7 +64,7 @@ export function ProductDialog({ isOpen, setIsOpen, onSave, product }: ProductDia
       }
       setIsGenerating(true);
       try {
-        const result = await generateImage({ prompt: watchedPrompt });
+        const result = await generateAndUploadImage({ prompt: watchedPrompt });
         setValue('imageUrl', result.imageUrl, { shouldValidate: true });
         toast({ title: 'Image Generated!', description: 'The image has been successfully generated and updated.' });
       } catch (error) {
