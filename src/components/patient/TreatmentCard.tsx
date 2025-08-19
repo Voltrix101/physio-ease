@@ -1,7 +1,6 @@
 
 import Image from 'next/image';
 import type { Treatment } from '@/lib/types';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Clock, Tag } from 'lucide-react';
 
@@ -26,7 +25,7 @@ export function TreatmentCard({ treatment }: TreatmentCardProps) {
         <div className="p-6 flex flex-col flex-grow">
             <h3 className="text-xl font-headline font-semibold text-foreground">{treatment.name}</h3>
             <p className="text-base text-muted-foreground mt-2 flex-grow">{treatment.description}</p>
-            <div className="flex justify-between items-center mt-4 text-base" style={{color: '#198754'}}>
+            <div className="flex justify-between items-center mt-4 text-base text-green-600 dark:text-green-400">
                 <div className="flex items-center gap-2">
                     <Tag className="h-4 w-4" />
                     <span className="font-semibold">₹{treatment.price}</span>
