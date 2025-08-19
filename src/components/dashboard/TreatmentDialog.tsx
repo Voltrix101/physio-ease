@@ -29,10 +29,33 @@ interface TreatmentDialogProps {
   treatment?: Treatment;
 }
 
+const hintToImageMap: Record<string, string> = {
+    "physiotherapy manual therapy": "https://images.unsplash.com/photo-1599447462463-0599a37a67a8?q=80&w=1470&auto=format&fit=crop",
+    "physiotherapy exercise training": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1470&auto=format&fit=crop",
+    "physiotherapy electrotherapy": "https://images.unsplash.com/photo-1629822442426-003a71f05796?q=80&w=1470&auto=format&fit=crop",
+    "physiotherapy ultrasound therapy": "https://images.unsplash.com/photo-1605793520092-231584161b4a?q=80&w=1471&auto=format&fit=crop",
+    "physiotherapy hot cold therapy": "https://images.unsplash.com/photo-1576091160550-2173dba9996a?q=80&w=1470&auto=format&fit=crop",
+    "physiotherapy kinesio taping": "https://images.unsplash.com/photo-1616886847038-1a2933735a11?q=80&w=1470&auto=format&fit=crop",
+    "physiotherapy traction therapy": "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1470&auto=format&fit=crop",
+    "physiotherapy dry needling acupuncture": "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?q=80&w=1587&auto=format&fit=crop",
+    "physiotherapy neurological rehab": "https://images.unsplash.com/photo-1581092921532-7227429d35a8?q=80&w=1470&auto=format&fit=crop",
+}
+
 export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: TreatmentDialogProps) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<TreatmentFormData>({
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<TreatmentFormData>({
     resolver: zodResolver(treatmentSchema),
   });
+  
+  const dataAiHint = watch('dataAiHint');
+
+  useEffect(() => {
+    if (dataAiHint && hintToImageMap[dataAiHint]) {
+        if (watch('imageUrl').includes('placehold.co')) {
+            setValue('imageUrl', hintToImageMap[dataAiHint]);
+        }
+    }
+  }, [dataAiHint, setValue, watch]);
+
 
   useEffect(() => {
     if (isOpen) {
@@ -52,10 +75,6 @@ export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: Treatm
   }, [treatment, reset, isOpen]);
 
   const onSubmit = (data: TreatmentFormData) => {
-    // Replace placeholder with a relevant Unsplash image if the hint exists
-    if (data.dataAiHint && data.imageUrl.includes('placehold.co')) {
-        data.imageUrl = `https://images.unsplash.com/photo-1591319046755-0af32349b1cd?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`;
-    }
     onSave(data);
   };
 
@@ -91,14 +110,15 @@ export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: Treatm
                 {errors.duration && <p className="text-red-500 text-xs">{errors.duration.message}</p>}
             </div>
           </div>
+           <div className="grid gap-2">
+            <Label htmlFor="dataAiHint">AI Image Hint</Label>
+            <Input id="dataAiHint" {...register('dataAiHint')} placeholder="e.g. physiotherapy exercise" />
+            <p className="text-xs text-muted-foreground">Pasting a hint from the list will auto-select an image.</p>
+          </div>
           <div className="grid gap-2">
             <Label htmlFor="imageUrl">Image URL</Label>
             <Input id="imageUrl" {...register('imageUrl')} />
             {errors.imageUrl && <p className="text-red-500 text-xs">{errors.imageUrl.message}</p>}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="dataAiHint">AI Image Hint</Label>
-            <Input id="dataAiHint" {...register('dataAiHint')} placeholder="e.g. physiotherapy exercise" />
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>

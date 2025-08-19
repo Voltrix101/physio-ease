@@ -8,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Link from 'next/link';
 
-import { createAppointment, type CreateAppointmentResult } from '@/lib/appointments';
 import type { Treatment } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,43 +21,41 @@ import { BookingSuccess } from './BookingSuccess';
 import { ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { createAppointment, State } from '@/app/book/actions';
+import { useFormState } from 'react-dom';
 
 
-const formSchema = z.object({
+const FormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   treatmentId: z.string({ required_error: 'Please select a service.' }),
   date: z.date({ required_error: 'Please select a date.' }),
   time: z.string({ required_error: 'Please select a time.' }),
-  paymentProofType: z.enum(['text', 'image']),
-  paymentProofText: z.string().optional(),
-  paymentProofFile: z.any().optional(),
-}).refine(data => {
-    if (data.paymentProofType === 'text') return !!data.paymentProofText && data.paymentProofText.length > 0;
-    if (data.paymentProofType === 'image') return !!data.paymentProofFile?.[0];
-    return false;
-}, { message: 'Payment proof is required', path: ['paymentProofFile']});
+  paymentProof: z.any(),
+});
 
 
 const timeSlots = ['09:00 AM', '10:00 AM', '11:00 AM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'];
 
 export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   const [step, setStep] = useState(1);
-  const { toast } = useToast();
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   
   const defaultTreatmentId = useMemo(() => searchParams.get('treatment') || undefined, [searchParams]);
   
+  const [paymentProofType, setPaymentProofType] = useState<'image'|'text'>('image');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitResult, setSubmitResult] = useState<CreateAppointmentResult | null>(null);
+  const [formState, setFormState] = useState<State | null>(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
     defaultValues: {
+      name: user?.displayName || '',
       treatmentId: defaultTreatmentId,
-      paymentProofType: 'image',
     },
   });
+  
+  const { toast } = useToast();
 
   const selectedTreatmentId = form.watch('treatmentId');
 
@@ -73,79 +70,65 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
       reader.readAsDataURL(file);
     });
   };
-
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
     if (!user) {
-        toast({
-            variant: "destructive",
-            title: "Authentication Error",
-            description: "You must be logged in to book an appointment.",
-        });
+        toast({ variant: 'destructive', title: 'Not logged in', description: 'Please log in to book an appointment.' });
         return;
     }
-    
+
     setIsSubmitting(true);
+
+    const formData = new FormData(e.currentTarget);
+    const paymentProofFile = formData.get('paymentProof') as File;
+    const paymentProofText = formData.get('paymentProofText') as string;
     
-    let proof = '';
-    if (data.paymentProofType === 'text' && data.paymentProofText) {
-      proof = data.paymentProofText;
-    } else if (data.paymentProofType === 'image' && data.paymentProofFile?.[0]) {
-      try {
-        proof = await readFileAsDataURL(data.paymentProofFile[0]);
-      } catch (error) {
-        toast({
-            variant: "destructive",
-            title: "File Error",
-            description: "Could not read the uploaded file. Please try again.",
-        });
+    let proofValue = '';
+    if (paymentProofType === 'image' && paymentProofFile && paymentProofFile.size > 0) {
+        proofValue = await readFileAsDataURL(paymentProofFile);
+    } else if (paymentProofType === 'text' && paymentProofText) {
+        proofValue = paymentProofText;
+    }
+    
+    if (!proofValue) {
+        toast({ variant: 'destructive', title: 'Missing Proof', description: 'Please provide payment proof.' });
         setIsSubmitting(false);
         return;
-      }
     }
     
-    try {
-      const result = await createAppointment({
-        name: data.name,
-        treatmentId: data.treatmentId,
-        date: data.date.toISOString(),
-        time: data.time,
-        paymentProof: proof,
-        userId: user.uid,
-      });
-      
-      setSubmitResult(result);
-      
-      if (result.success) {
-        toast({
-          title: "Success!",
-          description: result.message,
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: result.message,
-        });
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    const finalFormData = new FormData();
+    finalFormData.append('name', form.getValues('name'));
+    finalFormData.append('treatmentId', form.getValues('treatmentId'));
+    finalFormData.append('date', form.getValues('date').toISOString());
+    finalFormData.append('time', form.getValues('time'));
+    finalFormData.append('paymentProof', proofValue);
+    finalFormData.append('patientId', user.uid);
+    
+    const result = await createAppointment(formState as State, finalFormData);
+    
+    setFormState(result);
+    setIsSubmitting(false);
 
-  if (submitResult?.success) {
+     if (!result.success) {
+        toast({
+            variant: "destructive",
+            title: "Booking Failed",
+            description: result.message || 'An unknown error occurred.',
+        });
+    }
+  }
+
+
+  if (formState?.success) {
     return <BookingSuccess />;
   }
   
   return (
     <div className="space-y-8">
       <Progress value={(step / 3) * 100} className="w-full h-2 bg-secondary" />
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleFormSubmit} className="space-y-6">
         {step === 1 && (
           <div className="space-y-4 animate-in fade-in-0 duration-500">
             <h3 className="text-xl font-headline">Step 1: Choose Your Service</h3>
@@ -208,29 +191,27 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
             <h3 className="text-xl font-headline">Step 3: Your Details & Payment Proof</h3>
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
-              <Input id="name" {...form.register('name')} placeholder="e.g. Jane Doe" defaultValue={user?.displayName || ''} />
+              <Input id="name" {...form.register('name')} placeholder="e.g. Jane Doe" />
               {form.formState.errors.name && <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>}
             </div>
             
-            <Controller name="paymentProofType" control={form.control} render={({field}) => (
-                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex gap-4">
-                    <Label htmlFor="type-image" className="flex items-center gap-2 cursor-pointer"><RadioGroupItem value="image" id="type-image"/>Upload Screenshot</Label>
-                    <Label htmlFor="type-text" className="flex items-center gap-2 cursor-pointer"><RadioGroupItem value="text" id="type-text"/>Enter Transaction ID</Label>
-                </RadioGroup>
-            )} />
+             <RadioGroup onValueChange={(v) => setPaymentProofType(v as 'image'|'text')} defaultValue={paymentProofType} className="flex gap-4">
+                <Label htmlFor="type-image" className="flex items-center gap-2 cursor-pointer"><RadioGroupItem value="image" id="type-image"/>Upload Screenshot</Label>
+                <Label htmlFor="type-text" className="flex items-center gap-2 cursor-pointer"><RadioGroupItem value="text" id="type-text"/>Enter Transaction ID</Label>
+            </RadioGroup>
 
-            {form.watch('paymentProofType') === 'image' ? (
+            {paymentProofType === 'image' ? (
                  <div className="space-y-2">
-                    <Label htmlFor="paymentProofFile">Upload UPI Screenshot</Label>
-                     <Input id="paymentProofFile" type="file" accept="image/*" {...form.register('paymentProofFile')} className="pt-2 h-11"/>
+                    <Label htmlFor="paymentProof">Upload UPI Screenshot</Label>
+                     <Input id="paymentProof" name="paymentProof" type="file" accept="image/*" className="pt-2 h-11"/>
                  </div>
             ) : (
                 <div className="space-y-2">
                     <Label htmlFor="paymentProofText">Transaction ID</Label>
-                    <Input id="paymentProofText" {...form.register('paymentProofText')} placeholder="Enter UPI transaction ID" />
+                    <Input id="paymentProofText" name="paymentProofText" placeholder="Enter UPI transaction ID" />
                 </div>
             )}
-             {form.formState.errors.paymentProofFile && <p className="text-sm text-destructive">{String(form.formState.errors.paymentProofFile.message)}</p>}
+             {form.formState.errors.paymentProof && <p className="text-sm text-destructive">{String(form.formState.errors.paymentProof.message)}</p>}
             
             <div className="flex justify-between items-center">
               <Button type="button" variant="outline" onClick={prevStep}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
@@ -247,10 +228,11 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
                     </AlertDescription>
                 </Alert>
             )}
-            {submitResult?.message && !submitResult.success && <p className="text-sm text-destructive mt-2">{submitResult.message}</p>}
+            {formState?.message && !formState.success && <p className="text-sm text-destructive mt-2">{formState.message}</p>}
           </div>
         )}
       </form>
     </div>
   );
 }
+

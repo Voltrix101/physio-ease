@@ -25,6 +25,10 @@ export async function createAppointment(data: AppointmentData): Promise<CreateAp
   try {
     const { name, treatmentId, date, time, paymentProof, userId } = data;
     
+    if (!userId) {
+      return { success: false, message: 'User is not logged in.' };
+    }
+    
     // Verify payment proof using AI
     const verificationResult = await verifyPaymentProof({ paymentProof });
     
@@ -44,8 +48,7 @@ export async function createAppointment(data: AppointmentData): Promise<CreateAp
     // Create appointment document
     await addDoc(collection(db, 'appointments'), {
       patientName: name,
-      patientId: userId,
-      userId: userId, // Required for Firestore rules
+      patientId: userId, // This is the crucial field for the security rule
       treatmentId: treatmentId,
       treatmentName: selectedTreatment?.name || 'Unknown Treatment',
       date: new Date(date),
