@@ -40,16 +40,19 @@ export default function VideosPage() {
       setFiltered(videos);
     } else {
       const lower = search.toLowerCase();
+      const categoryMatch = categories.find(c => c.name.toLowerCase() === lower);
+      
       setFiltered(
         videos.filter(
           (v) =>
             v.title.toLowerCase().includes(lower) ||
+            (categoryMatch && v.categoryId === categoryMatch.id) ||
             v.categoryId.toLowerCase().includes(lower) ||
             v.tags?.some((tag) => tag.toLowerCase().includes(lower))
         )
       );
     }
-  }, [search, videos]);
+  }, [search, videos, categories]);
 
   // shuffle random videos
   const shuffleVideos = () => {
@@ -183,4 +186,3 @@ export default function VideosPage() {
     </div>
   );
 }
-
