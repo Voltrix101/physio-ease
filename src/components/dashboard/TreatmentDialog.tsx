@@ -12,13 +12,16 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import type { Treatment } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { generateImage } from '@/ai/flows/generate-image-flow';
+import { Loader2, Sparkles } from 'lucide-react';
+
 
 const treatmentSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   price: z.coerce.number().min(0, 'Price cannot be negative'),
   duration: z.coerce.number().min(1, 'Duration must be at least 1 minute'),
-  imageUrl: z.string().url('Must be a valid URL.'),
+  imageUrl: z.string().url('Must be a valid URL or a data URI.'),
   dataAiHint: z.string().optional(),
 });
 
@@ -32,17 +35,21 @@ interface TreatmentDialogProps {
 }
 
 export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: TreatmentDialogProps) {
-  const { register, handleSubmit, reset, formState: { errors }, watch } = useForm<TreatmentFormData>({
+  const { register, handleSubmit, reset, formState: { errors }, watch, setValue } = useForm<TreatmentFormData>({
     resolver: zodResolver(treatmentSchema),
   });
   
   const { toast } = useToast();
   const watchedImageUrl = watch('imageUrl');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [imagePrompt, setImagePrompt] = useState('');
+
 
   useEffect(() => {
     if (isOpen) {
         if (treatment) {
           reset(treatment);
+          setImagePrompt(treatment.dataAiHint || '');
         } else {
           reset({
             name: '',
@@ -52,12 +59,42 @@ export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: Treatm
             imageUrl: 'https://placehold.co/600x400.png',
             dataAiHint: '',
           });
+          setImagePrompt('');
         }
     }
   }, [treatment, reset, isOpen]);
 
+ const handleGenerateImage = async () => {
+    if (!imagePrompt) {
+        toast({
+            variant: 'destructive',
+            title: "Prompt is empty",
+            description: "Please enter a prompt to generate an image.",
+        });
+        return;
+    }
+    setIsGenerating(true);
+    try {
+        const result = await generateImage({ prompt: imagePrompt });
+        setValue('imageUrl', result.imageUrl, { shouldValidate: true });
+        toast({
+            title: "Image Generated!",
+            description: "The preview has been updated with the new image."
+        });
+    } catch (error) {
+        console.error("Error generating image:", error);
+        toast({
+            variant: 'destructive',
+            title: "Generation Failed",
+            description: "Could not generate the image. Please try again."
+        });
+    } finally {
+        setIsGenerating(false);
+    }
+  };
+
   const onSubmit = (data: TreatmentFormData) => {
-    onSave(data);
+    onSave({ ...data, dataAiHint: imagePrompt });
   };
 
   return (
@@ -93,14 +130,20 @@ export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: Treatm
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="imageUrl">Image URL</Label>
-            <Input id="imageUrl" {...register('imageUrl')} placeholder="https://your-image-host.com/image.png" />
-            {errors.imageUrl && <p className="text-red-500 text-xs">{errors.imageUrl.message}</p>}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="dataAiHint">AI Image Hint</Label>
-            <Input id="dataAiHint" {...register('dataAiHint')} placeholder="e.g. physiotherapy exercise" />
-            <p className="text-xs text-muted-foreground">Add keywords for future AI image sourcing.</p>
+            <Label htmlFor="imagePrompt">Image Generation Prompt</Label>
+            <div className="flex gap-2">
+              <Input
+                id="imagePrompt"
+                value={imagePrompt}
+                onChange={(e) => setImagePrompt(e.target.value)}
+                placeholder="e.g., patient receiving back massage"
+              />
+              <Button type="button" onClick={handleGenerateImage} disabled={isGenerating}>
+                {isGenerating ? <Loader2 className="animate-spin" /> : <Sparkles />}
+                Generate
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Describe the image you want the AI to create.</p>
           </div>
           <div className="space-y-2">
             <Label>Image Preview</Label>
@@ -109,6 +152,11 @@ export function TreatmentDialog({ isOpen, setIsOpen, onSave, treatment }: Treatm
                 <Image src={watchedImageUrl} alt="Image preview" fill style={{ objectFit: 'cover' }} />
               )}
             </div>
+          </div>
+           <div className="space-y-2">
+            <Label htmlFor="imageUrl">Image URL (or paste a Data URI)</Label>
+            <Input id="imageUrl" {...register('imageUrl')} placeholder="AI-generated images will appear here" />
+            {errors.imageUrl && <p className="text-red-500 text-xs">{errors.imageUrl.message}</p>}
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>

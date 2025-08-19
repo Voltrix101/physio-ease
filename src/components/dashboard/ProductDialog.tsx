@@ -11,12 +11,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { generateImage } from '@/ai/flows/generate-image-flow';
+import { Loader2, Sparkles } from 'lucide-react';
 
 const productSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
   price: z.coerce.number().min(0, 'Price cannot be negative'),
   affiliateUrl: z.string().url('Must be a valid affiliate URL'),
-  imageUrl: z.string().url('Must be a valid URL.'),
+  imageUrl: z.string().url('Must be a valid URL or a data URI'),
   dataAiHint: z.string().optional(),
 });
 
@@ -36,11 +38,14 @@ export function ProductDialog({ isOpen, setIsOpen, onSave, product }: ProductDia
   
   const { toast } = useToast();
   const watchedImageUrl = watch('imageUrl');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [imagePrompt, setImagePrompt] = useState('');
 
   useEffect(() => {
     if (isOpen) {
         if (product) {
           reset(product);
+          setImagePrompt(product.dataAiHint || '');
         } else {
           reset({
             name: '',
@@ -49,13 +54,43 @@ export function ProductDialog({ isOpen, setIsOpen, onSave, product }: ProductDia
             imageUrl: 'https://placehold.co/300x300.png',
             dataAiHint: '',
           });
+          setImagePrompt('');
         }
     }
   }, [product, reset, isOpen]);
 
+  const handleGenerateImage = async () => {
+    if (!imagePrompt) {
+        toast({
+            variant: 'destructive',
+            title: "Prompt is empty",
+            description: "Please enter a prompt to generate an image.",
+        });
+        return;
+    }
+    setIsGenerating(true);
+    try {
+        const result = await generateImage({ prompt: imagePrompt });
+        setValue('imageUrl', result.imageUrl, { shouldValidate: true });
+        toast({
+            title: "Image Generated!",
+            description: "The preview has been updated with the new image."
+        });
+    } catch (error) {
+        console.error("Error generating image:", error);
+        toast({
+            variant: 'destructive',
+            title: "Generation Failed",
+            description: "Could not generate the image. Please try again."
+        });
+    } finally {
+        setIsGenerating(false);
+    }
+  };
+
 
   const onSubmit = (data: ProductFormData) => {
-    onSave(data);
+    onSave({ ...data, dataAiHint: imagePrompt });
   };
 
   return (
@@ -83,15 +118,21 @@ export function ProductDialog({ isOpen, setIsOpen, onSave, product }: ProductDia
             <Input id="affiliateUrl" {...register('affiliateUrl')} />
             {errors.affiliateUrl && <p className="text-red-500 text-xs">{errors.affiliateUrl.message}</p>}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="imageUrl">Image URL</Label>
-            <Input id="imageUrl" {...register('imageUrl')} placeholder="https://your-image-host.com/image.png" />
-            {errors.imageUrl && <p className="text-red-500 text-xs">{errors.imageUrl.message}</p>}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="dataAiHint">AI Image Hint</Label>
-            <Input id="dataAiHint" {...register('dataAiHint')} placeholder="e.g. physiotherapy equipment" />
-             <p className="text-xs text-muted-foreground">Add keywords for future AI image sourcing.</p>
+           <div className="space-y-2">
+            <Label htmlFor="imagePrompt">Image Generation Prompt</Label>
+            <div className="flex gap-2">
+              <Input
+                id="imagePrompt"
+                value={imagePrompt}
+                onChange={(e) => setImagePrompt(e.target.value)}
+                placeholder="e.g., blue yoga mat on a wooden floor"
+              />
+              <Button type="button" onClick={handleGenerateImage} disabled={isGenerating}>
+                {isGenerating ? <Loader2 className="animate-spin" /> : <Sparkles />}
+                Generate
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Describe the image you want the AI to create.</p>
           </div>
           <div className="space-y-2">
             <Label>Image Preview</Label>
@@ -100,6 +141,11 @@ export function ProductDialog({ isOpen, setIsOpen, onSave, product }: ProductDia
                 <Image src={watchedImageUrl} alt="Generated image preview" fill style={{ objectFit: 'cover' }} />
               )}
             </div>
+          </div>
+           <div className="space-y-2">
+            <Label htmlFor="imageUrl">Image URL (or paste a Data URI)</Label>
+            <Input id="imageUrl" {...register('imageUrl')} placeholder="AI-generated images will appear here" />
+            {errors.imageUrl && <p className="text-red-500 text-xs">{errors.imageUrl.message}</p>}
           </div>
 
           <DialogFooter>
