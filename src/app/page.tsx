@@ -1,6 +1,4 @@
 
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -8,11 +6,8 @@ import { Header } from '@/components/Header';
 import { TreatmentCarousel } from '@/components/patient/TreatmentCarousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, orderBy, query, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import type { Treatment, Testimonial } from '@/lib/types';
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/use-auth';
-import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 
 
@@ -23,46 +18,18 @@ async function getTreatments(): Promise<Treatment[]> {
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Treatment));
 }
 
+async function getTestimonials(): Promise<Testimonial[]> {
+    const testimonialsCol = collection(db, 'testimonials');
+    const q = query(testimonialsCol, orderBy('name'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+}
 
-export default function Home() {
-  const [treatments, setTreatments] = useState<Treatment[]>([]);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
-  const { user } = useAuth();
-  const router = useRouter();
 
-  useEffect(() => {
-    async function fetchTreatments() {
-        try {
-            const fetchedTreatments = await getTreatments();
-            setTreatments(fetchedTreatments);
-        } catch (error) {
-            console.error("Failed to fetch treatments:", error);
-        }
-    }
-    fetchTreatments();
-
-    const q = query(collection(db, "testimonials"), orderBy("name"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const testimonialsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as Testimonial));
-      setTestimonials(testimonialsData);
-      setLoadingTestimonials(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+export default async function Home() {
+  const treatments = await getTreatments();
+  const testimonials = await getTestimonials();
   
-  const handleBookAppointmentClick = () => {
-    if (user) {
-      router.push('/book');
-    } else {
-      router.push('/login');
-    }
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -80,8 +47,8 @@ export default function Home() {
           <div className="relative z-10 max-w-2xl px-4 animate-riseUp">
             <h1 className="text-4xl font-headline mb-4 tracking-wide text-white sm:text-5xl md:text-6xl">Restore. Revive. Renew.</h1>
             <p className="text-lg mb-6 text-white/90 md:text-xl">Personalized physiotherapy care by Dr. Amiya Ballav Roy</p>
-            <Button onClick={handleBookAppointmentClick} size="lg" variant="accent" className="px-8 py-4 text-lg font-medium">
-              Book Appointment
+             <Button asChild size="lg" variant="accent" className="px-8 py-4 text-lg font-medium">
+                <Link href="/book">Book Appointment</Link>
             </Button>
           </div>
         </section>
@@ -114,7 +81,7 @@ export default function Home() {
             <div className="container px-4 md:px-6">
                  <h2 className="text-3xl font-headline tracking-tight text-center mb-12 text-deep-highlight md:text-4xl">Patient Testimonials</h2>
                  <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    {loadingTestimonials ? (
+                    {testimonials.length === 0 ? (
                       Array.from({ length: 3 }).map((_, i) => (
                         <Card key={i} className="bg-card border-l-4 border-accent shadow-md dark:card-shadow">
                             <CardHeader>
