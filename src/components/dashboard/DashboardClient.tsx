@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useSearchParams } from 'next/navigation';
@@ -10,6 +9,7 @@ import { VideosList } from "./VideosList";
 import { TestimonialsList } from './TestimonialsList';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import { PatientsList } from './PatientsList';
+import { CategoriesList } from './CategoriesList';
 
 export function DashboardClient() {
   const searchParams = useSearchParams();
@@ -25,6 +25,8 @@ export function DashboardClient() {
         return <ProductsList />;
       case 'videos':
         return <VideosList />;
+      case 'categories':
+        return <CategoriesList />;
       case 'testimonials':
         return <TestimonialsList />;
       case 'patients':

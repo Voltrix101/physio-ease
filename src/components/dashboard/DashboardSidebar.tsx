@@ -1,11 +1,10 @@
-
 'use client';
 
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Stethoscope, LayoutDashboard, Calendar, ListOrdered, ShoppingCart, Youtube, Star, User, Settings, LineChart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Stethoscope, LayoutDashboard, Calendar, ListOrdered, ShoppingCart, Youtube, Star, User, Settings, LineChart, ChevronLeft, ChevronRight, FolderKanban } from 'lucide-react';
 import { useState } from 'react';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '../ui/tooltip';
 
@@ -16,6 +15,7 @@ const navItems = [
   { href: 'treatments', icon: ListOrdered, label: 'Treatments' },
   { href: 'products', icon: ShoppingCart, label: 'Products' },
   { href: 'videos', icon: Youtube, label: 'Videos' },
+  { href: 'categories', icon: FolderKanban, label: 'Categories' },
   { href: 'testimonials', icon: Star, label: 'Testimonials' },
 ];
 

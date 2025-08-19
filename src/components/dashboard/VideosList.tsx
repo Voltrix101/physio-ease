@@ -1,12 +1,11 @@
-
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PlusCircle, MoreHorizontal, Loader2, Link as LinkIcon, Database } from 'lucide-react';
-import type { Video } from '@/lib/types';
+import type { Video, Category } from '@/lib/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { VideoDialog } from './VideoDialog';
 import { useToast } from '@/hooks/use-toast';
@@ -19,15 +18,23 @@ import { seedVideosAndCategories } from '@/lib/seed';
 
 export function VideosList() {
   const [videos, setVideos] = useState<Video[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSeeding, setIsSeeding] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<Video | undefined>(undefined);
   const { toast } = useToast();
+  
+  const categoryMap = useMemo(() => {
+    return categories.reduce((map, cat) => {
+      map[cat.id] = cat.name;
+      return map;
+    }, {} as Record<string, string>);
+  }, [categories]);
 
   useEffect(() => {
-    const q = query(collection(db, "videos"), orderBy("title"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const qVideos = query(collection(db, "videos"), orderBy("title"));
+    const unsubscribeVideos = onSnapshot(qVideos, (querySnapshot) => {
         const videosData = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -43,8 +50,17 @@ export function VideosList() {
         });
         setLoading(false);
     });
+    
+    const qCategories = query(collection(db, "categories"), orderBy("name"));
+    const unsubscribeCategories = onSnapshot(qCategories, (snapshot) => {
+        const catData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Category));
+        setCategories(catData);
+    });
 
-    return () => unsubscribe();
+    return () => {
+        unsubscribeVideos();
+        unsubscribeCategories();
+    };
   }, [toast]);
 
 
@@ -145,7 +161,7 @@ export function VideosList() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="min-w-[200px]">Title</TableHead>
-                  <TableHead className="min-w-[150px]">Category ID</TableHead>
+                  <TableHead className="min-w-[150px]">Category</TableHead>
                   <TableHead>YouTube ID</TableHead>
                   <TableHead>Link</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -156,7 +172,7 @@ export function VideosList() {
                   <TableRow key={video.id}>
                     <TableCell className="font-medium">{video.title}</TableCell>
                     <TableCell>
-                        <Badge variant="secondary">{video.categoryId}</Badge>
+                        <Badge variant="secondary">{categoryMap[video.categoryId] || 'N/A'}</Badge>
                     </TableCell>
                     <TableCell>{video.youtubeId}</TableCell>
                     <TableCell>
