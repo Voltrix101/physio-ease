@@ -11,15 +11,15 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const GenerateImageInputSchema = z.object({
+const GenerateImageInputSchema = z.object({
   prompt: z.string().describe('The text prompt to generate the image from.'),
 });
-export type GenerateImageInput = z.infer<typeof GenerateImageInputSchema>;
+type GenerateImageInput = z.infer<typeof GenerateImageInputSchema>;
 
-export const GenerateImageOutputSchema = z.object({
+const GenerateImageOutputSchema = z.object({
   imageUrl: z.string().describe('The data URI of the generated image.'),
 });
-export type GenerateImageOutput = z.infer<typeof GenerateImageOutputSchema>;
+type GenerateImageOutput = z.infer<typeof GenerateImageOutputSchema>;
 
 export async function generateImage(
   input: GenerateImageInput
