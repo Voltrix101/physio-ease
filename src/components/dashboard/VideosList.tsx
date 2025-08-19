@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlusCircle, MoreHorizontal, Loader2, Link as LinkIcon } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Loader2, Link as LinkIcon, Database } from 'lucide-react';
 import type { Video } from '@/lib/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { VideoDialog } from './VideoDialog';
@@ -14,11 +14,13 @@ import { db } from '@/lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import Link from 'next/link';
 import { Badge } from '../ui/badge';
+import { seedVideos } from '@/lib/seed';
 
 
 export function VideosList() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSeeding, setIsSeeding] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<Video | undefined>(undefined);
   const { toast } = useToast();
@@ -82,6 +84,26 @@ export function VideosList() {
     }
   };
   
+   const handleSeed = async () => {
+    setIsSeeding(true);
+    try {
+        await seedVideos();
+        toast({
+            title: "Database Seeded!",
+            description: "The initial list of videos has been added."
+        });
+    } catch (error) {
+         toast({
+            variant: 'destructive',
+            title: 'Seeding Failed',
+            description: 'Could not add the initial videos.'
+        });
+        console.error("Error seeding videos: ", error);
+    } finally {
+        setIsSeeding(false);
+    }
+  }
+
   const handleEdit = (video: Video) => {
     setSelectedVideo(video);
     setIsDialogOpen(true);
@@ -108,6 +130,14 @@ export function VideosList() {
         {loading ? (
             <div className="flex justify-center items-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        ) : videos.length === 0 ? (
+            <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                <p className="text-muted-foreground mb-4">Your videos list is empty.</p>
+                <Button onClick={handleSeed} disabled={isSeeding}>
+                    {isSeeding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Database className="mr-2 h-4 w-4" />}
+                    {isSeeding ? 'Seeding...' : 'Seed Initial Videos'}
+                </Button>
             </div>
         ) : (
           <div className="rounded-md border">

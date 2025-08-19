@@ -86,25 +86,102 @@ const treatmentsData = [
   }
 ];
 
+const videosData = [
+    {
+      id: "pelvic-tilts",
+      title: "Back Pain Relief - Pelvic Tilts",
+      category: "Back Pain Relief",
+      description: "Gentle pelvic tilt exercise to reduce lower back stiffness and improve posture.",
+      youtubeId: "z915K14nL8s"
+    },
+    {
+      id: "cat-cow-stretch",
+      title: "Core Strengthening - Cat-Cow",
+      category: "Back Pain Relief",
+      description: "A classic yoga pose to increase spinal flexibility and relieve back tension.",
+      youtubeId: "z915K14nL8s"
+    },
+    {
+      id: "neck-mobility",
+      title: "Neck Mobility Stretches",
+      category: "Neck & Shoulder Pain",
+      description: "Improve range of motion and decrease stiffness in your neck and upper shoulders.",
+      youtubeId: "z915K14nL8s"
+    },
+    {
+      id: "quad-sets",
+      title: "Knee Pain - Quadriceps Strengthening",
+      category: "Knee Pain & Arthritis",
+      description: "Simple but effective exercise to activate and strengthen the quad muscles without stressing the knee joint.",
+      youtubeId: "z915K14nL8s"
+    },
+    {
+      id: "piriformis-stretch",
+      title: "Sciatica Relief - Piriformis Stretch",
+      category: "Sciatica & Leg Pain",
+      description: "This stretch targets the piriformis muscle to relieve pressure on the sciatic nerve.",
+      youtubeId: "z915K14nL8s"
+    },
+    {
+      id: "chin-tucks",
+      title: "Improve Your Posture - Chin Tucks",
+      category: "Posture Correction",
+      description: "A fundamental exercise to correct forward head posture and strengthen neck muscles.",
+      youtubeId: "z915K14nL8s"
+    },
+    {
+      id: "ankle-balance",
+      title: "Ankle Injury Recovery - Balance Drills",
+      category: "Sports Injury Recovery",
+      description: "Rebuild stability and proprioception in your ankle after a sprain or injury.",
+      youtubeId: "z915K14nL8s"
+    },
+    {
+      id: "chair-squats",
+      title: "Mobility for Seniors - Chair Squats",
+      category: "Elderly Mobility & Balance",
+      description: "A safe way to build leg strength and improve balance, using a chair for support.",
+      youtubeId: "z915K14nL8s"
+    }
+];
+
 export async function seedTreatments() {
   const treatmentsCollection = collection(db, 'treatments');
   
-  // Check if the collection is already populated
   const snapshot = await getDocs(treatmentsCollection);
   if (!snapshot.empty) {
     console.log('Treatments collection is not empty. Skipping seed.');
     return;
   }
 
-  // Use a batch write for efficiency
   const batch = writeBatch(db);
-
   treatmentsData.forEach((treatment) => {
     const { id, ...data } = treatment;
-    const docRef = doc(db, "treatments", id); // Use the specific ID
+    const docRef = doc(db, "treatments", id);
     batch.set(docRef, data);
   });
 
   await batch.commit();
   console.log('Successfully seeded treatments collection.');
+}
+
+
+export async function seedVideos() {
+  const videosCollection = collection(db, 'videos');
+  
+  const snapshot = await getDocs(videosCollection);
+  if (!snapshot.empty) {
+    console.log('Videos collection is not empty. Skipping seed.');
+    return;
+  }
+
+  const batch = writeBatch(db);
+  videosData.forEach((video) => {
+    const { id, ...data } = video;
+    const docRef = doc(db, "videos", id);
+    batch.set(docRef, data);
+  });
+
+  await batch.commit();
+  console.log('Successfully seeded videos collection.');
 }
