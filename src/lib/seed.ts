@@ -86,97 +86,56 @@ const treatmentsData = [
   }
 ];
 
+const categoriesData = [
+    { id: 'back-pain', name: 'Back & Spine Care', icon: '🦴', description: 'Exercises for reducing back pain and improving spine stability.' },
+    { id: 'knee-pain', name: 'Knee Pain Relief', icon: '🦵', description: 'Exercises for reducing knee pain and improving stability.' },
+    { id: 'neck-shoulder', name: 'Neck & Shoulder', icon: '🤷', description: 'Stretches and exercises for neck and shoulder pain.' },
+    { id: 'sports-injury', name: 'Sports Injury', icon: '🏃', description: 'Rehabilitation exercises for common sports injuries.' },
+    { id: 'elderly-mobility', name: 'Elderly Mobility', icon: '👵', description: 'Gentle exercises to improve balance and mobility for seniors.' },
+    { id: 'posture-correction', name: 'Posture Correction', icon: '🧘', description: 'Exercises to correct posture and strengthen core muscles.' }
+];
+
 const videosData = [
-    {
-      id: "pelvic-tilts",
-      title: "Back Pain Relief - Pelvic Tilts",
-      category: "Back Pain Relief",
-      description: "Gentle pelvic tilt exercise to reduce lower back stiffness and improve posture.",
-      youtubeId: "z915K14nL8s"
-    },
-    {
-      id: "cat-cow-stretch",
-      title: "Core Strengthening - Cat-Cow",
-      category: "Back Pain Relief",
-      description: "A classic yoga pose to increase spinal flexibility and relieve back tension.",
-      youtubeId: "z915K14nL8s"
-    },
-    {
-      id: "neck-mobility",
-      title: "Neck Mobility Stretches",
-      category: "Neck & Shoulder Pain",
-      description: "Improve range of motion and decrease stiffness in your neck and upper shoulders.",
-      youtubeId: "z915K14nL8s"
-    },
-    {
-      id: "quad-sets",
-      title: "Knee Pain - Quadriceps Strengthening",
-      category: "Knee Pain & Arthritis",
-      description: "Simple but effective exercise to activate and strengthen the quad muscles without stressing the knee joint.",
-      youtubeId: "z915K14nL8s"
-    },
-    {
-      id: "piriformis-stretch",
-      title: "Sciatica Relief - Piriformis Stretch",
-      category: "Sciatica & Leg Pain",
-      description: "This stretch targets the piriformis muscle to relieve pressure on the sciatic nerve.",
-      youtubeId: "z915K14nL8s"
-    },
-    {
-      id: "chin-tucks",
-      title: "Improve Your Posture - Chin Tucks",
-      category: "Posture Correction",
-      description: "A fundamental exercise to correct forward head posture and strengthen neck muscles.",
-      youtubeId: "z915K14nL8s"
-    },
-    {
-      id: "ankle-balance",
-      title: "Ankle Injury Recovery - Balance Drills",
-      category: "Sports Injury Recovery",
-      description: "Rebuild stability and proprioception in your ankle after a sprain or injury.",
-      youtubeId: "z915K14nL8s"
-    },
-    {
-      id: "chair-squats",
-      title: "Mobility for Seniors - Chair Squats",
-      category: "Elderly Mobility & Balance",
-      description: "A safe way to build leg strength and improve balance, using a chair for support.",
-      youtubeId: "z915K14nL8s"
-    }
+    // Back Pain
+    { id: 'cat-cow', title: 'Cat-Cow Stretch', categoryId: 'back-pain', youtubeId: 'z915K14nL8s', duration: '2:15', tags: ['back', 'spine', 'flexibility'] },
+    { id: 'pelvic-tilts', title: 'Pelvic Tilts', categoryId: 'back-pain', youtubeId: 'z915K14nL8s', duration: '3:05', tags: ['back', 'core', 'stability'] },
+    // Knee Pain
+    { id: 'isometric-quads', title: 'Isometric Quads', categoryId: 'knee-pain', youtubeId: 'z915K14nL8s', duration: '3:42', tags: ['knee', 'rehab', 'strength'] },
+    { id: 'straight-leg-raises', title: 'Straight Leg Raises', categoryId: 'knee-pain', youtubeId: 'z915K14nL8s', duration: '4:10', tags: ['knee', 'strength'] },
+    // Neck & Shoulder
+    { id: 'neck-mobility-stretches', title: 'Neck Mobility Stretches', categoryId: 'neck-shoulder', youtubeId: 'z915K14nL8s', duration: '5:00', tags: ['neck', 'shoulder', 'stretch'] },
 ];
 
 export async function seedTreatments() {
   const treatmentsCollection = collection(db, 'treatments');
-  
-  // This check is removed to allow overwriting existing data.
-  // const snapshot = await getDocs(treatmentsCollection);
-  // if (!snapshot.empty) {
-  //   console.log('Treatments collection is not empty. Skipping seed.');
-  //   return;
-  // }
-
   const batch = writeBatch(db);
   treatmentsData.forEach((treatment) => {
     const { id, ...data } = treatment;
     const docRef = doc(db, "treatments", id);
     batch.set(docRef, data);
   });
-
   await batch.commit();
   console.log('Successfully seeded treatments collection.');
 }
 
-
-export async function seedVideos() {
+export async function seedVideosAndCategories() {
+  const categoriesCollection = collection(db, 'categories');
   const videosCollection = collection(db, 'videos');
   
-  const snapshot = await getDocs(videosCollection);
-  if (!snapshot.empty) {
-    console.log('Videos collection is not empty. Skipping seed.');
+  const catSnapshot = await getDocs(categoriesCollection);
+  if (!catSnapshot.empty) {
+    console.log('Categories collection is not empty. Skipping seed.');
     return;
   }
 
   const batch = writeBatch(db);
+  
+  categoriesData.forEach((category) => {
+    const { id, ...data } = category;
+    const docRef = doc(db, "categories", id);
+    batch.set(docRef, data);
+  });
+  
   videosData.forEach((video) => {
     const { id, ...data } = video;
     const docRef = doc(db, "videos", id);
@@ -184,5 +143,5 @@ export async function seedVideos() {
   });
 
   await batch.commit();
-  console.log('Successfully seeded videos collection.');
+  console.log('Successfully seeded videos and categories collections.');
 }

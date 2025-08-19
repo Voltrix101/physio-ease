@@ -23,12 +23,22 @@ export interface Product {
   dataAiHint?: string;
 }
 
+export interface Category {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    videoCount?: number;
+}
+
 export interface Video {
     id: string;
     title: string;
     description: string;
     youtubeId: string;
-    category?: string;
+    categoryId: string;
+    duration?: string;
+    tags?: string[];
 }
 
 export interface Testimonial {

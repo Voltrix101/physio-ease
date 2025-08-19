@@ -14,7 +14,7 @@ import { db } from '@/lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import Link from 'next/link';
 import { Badge } from '../ui/badge';
-import { seedVideos } from '@/lib/seed';
+import { seedVideosAndCategories } from '@/lib/seed';
 
 
 export function VideosList() {
@@ -87,18 +87,18 @@ export function VideosList() {
    const handleSeed = async () => {
     setIsSeeding(true);
     try {
-        await seedVideos();
+        await seedVideosAndCategories();
         toast({
             title: "Database Seeded!",
-            description: "The initial list of videos has been added."
+            description: "The initial video categories and videos have been added."
         });
     } catch (error) {
          toast({
             variant: 'destructive',
             title: 'Seeding Failed',
-            description: 'Could not add the initial videos.'
+            description: 'Could not add the initial data.'
         });
-        console.error("Error seeding videos: ", error);
+        console.error("Error seeding data: ", error);
     } finally {
         setIsSeeding(false);
     }
@@ -136,7 +136,7 @@ export function VideosList() {
                 <p className="text-muted-foreground mb-4">Your videos list is empty.</p>
                 <Button onClick={handleSeed} disabled={isSeeding}>
                     {isSeeding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Database className="mr-2 h-4 w-4" />}
-                    {isSeeding ? 'Seeding...' : 'Seed Initial Videos'}
+                    {isSeeding ? 'Seeding...' : 'Seed Videos & Categories'}
                 </Button>
             </div>
         ) : (
@@ -145,7 +145,7 @@ export function VideosList() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="min-w-[200px]">Title</TableHead>
-                  <TableHead className="min-w-[150px]">Category</TableHead>
+                  <TableHead className="min-w-[150px]">Category ID</TableHead>
                   <TableHead>YouTube ID</TableHead>
                   <TableHead>Link</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -156,7 +156,7 @@ export function VideosList() {
                   <TableRow key={video.id}>
                     <TableCell className="font-medium">{video.title}</TableCell>
                     <TableCell>
-                        {video.category && <Badge variant="secondary">{video.category}</Badge>}
+                        <Badge variant="secondary">{video.categoryId}</Badge>
                     </TableCell>
                     <TableCell>{video.youtubeId}</TableCell>
                     <TableCell>
