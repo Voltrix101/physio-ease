@@ -4,4 +4,4 @@ config();
 
 import '@/ai/flows/verify-payment-proof.ts';
 import '@/ai/flows/generate-image-flow';
-import '@/ai/flows/suggest-treatment-flow';
+import '@/ai/flows/chat-flow';

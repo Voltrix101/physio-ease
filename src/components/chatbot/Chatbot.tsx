@@ -5,14 +5,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, Send, X, Bot, User, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { suggestTreatment, SuggestTreatmentOutput } from '@/ai/flows/suggest-treatment-flow';
+import { chat, ChatInput, ChatOutput } from '@/ai/flows/chat-flow';
 import toast from 'react-hot-toast';
 
 interface Message {
-  id: number;
-  type: 'user' | 'bot';
-  text?: string;
-  recommendations?: SuggestTreatmentOutput['recommendations'];
+  role: 'user' | 'model' | 'tool';
+  content: ContentPart[];
+}
+
+interface ContentPart {
+    text?: string;
+    toolResponse?: {
+        name: string;
+        output: any;
+    };
 }
 
 export function Chatbot() {
@@ -29,40 +35,38 @@ export function Chatbot() {
   useEffect(scrollToBottom, [messages]);
   
    useEffect(() => {
-    if (isOpen) {
+    if (isOpen && messages.length === 0) {
       setMessages([
-        { id: 1, type: 'bot', text: "Hello! I'm PhysioBot. How can I help you today? Please describe your symptoms." }
+        { role: 'model', content: [{ text: "Hello! I'm PhysioBot. How can I help you today? Feel free to describe any symptoms you're experiencing." }] }
       ]);
     }
-  }, [isOpen]);
+   }, [isOpen, messages.length]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
-    const userMessage: Message = { id: Date.now(), type: 'user', text: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const userMessage: Message = { role: 'user', content: [{ text: input }] };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput('');
     setLoading(true);
 
     try {
-        const result = await suggestTreatment({ symptoms: input });
+        const result = await chat({ messages: newMessages });
         
         const botMessage: Message = { 
-            id: Date.now() + 1, 
-            type: 'bot', 
-            text: result.analysis,
-            recommendations: result.recommendations,
+            role: 'model',
+            content: result.history[result.history.length - 1].content
         };
-        setMessages((prev) => [...prev, botMessage]);
+        setMessages(prev => [...prev, botMessage]);
 
     } catch (error) {
-        console.error("Error calling suggestTreatment flow:", error);
+        console.error("Error calling chat flow:", error);
         toast.error("I'm sorry, I encountered an error. Please try again.");
         const errorMessage: Message = { 
-            id: Date.now() + 1, 
-            type: 'bot', 
-            text: "I'm having trouble connecting right now. Please try again in a moment."
+            role: 'model',
+            content: [{ text: "I'm having trouble connecting right now. Please try again in a moment."}]
         };
         setMessages((prev) => [...prev, errorMessage]);
     } finally {
@@ -97,23 +101,33 @@ export function Chatbot() {
             </header>
 
             <div className="flex-1 p-4 overflow-y-auto space-y-4">
-              {messages.map((message) => (
-                <div key={message.id} className={`flex items-start gap-3 ${message.type === 'user' ? 'justify-end' : ''}`}>
-                   {message.type === 'bot' && <Bot className="text-primary flex-shrink-0" />}
-                   <div className={`rounded-lg p-3 max-w-xs ${message.type === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                      <p className="text-sm">{message.text}</p>
-                      {message.recommendations && (
-                          <div className="mt-3 space-y-2">
-                            <p className="font-semibold text-sm">Would you like to book one of these treatments?</p>
-                            {message.recommendations.map(rec => (
-                                <Button asChild key={rec.id} size="sm" className="w-full justify-start" variant="secondary">
-                                    <Link href={`/book?treatment=${rec.id}`}>Book {rec.name}</Link>
-                                </Button>
-                            ))}
-                          </div>
-                      )}
+              {messages.map((message, index) => (
+                <div key={index} className={`flex items-start gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
+                   {message.role === 'model' && <Bot className="text-primary flex-shrink-0" />}
+                   
+                   <div className={`rounded-lg p-3 max-w-xs ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                        {message.content.map((part, partIndex) => {
+                            if (part.text) {
+                                return <p key={partIndex} className="text-sm">{part.text}</p>;
+                            }
+                            if (part.toolResponse && part.toolResponse.name === 'suggestTreatmentTool') {
+                                const output = part.toolResponse.output;
+                                return (
+                                    <div key={partIndex} className="mt-3 space-y-2">
+                                        <p className="font-semibold text-sm">Would you like to book one of these treatments?</p>
+                                        {output.recommendations.map((rec: any) => (
+                                            <Button asChild key={rec.id} size="sm" className="w-full justify-start" variant="secondary">
+                                                <Link href={`/book?treatment=${rec.id}`}>Book {rec.name}</Link>
+                                            </Button>
+                                        ))}
+                                    </div>
+                                );
+                            }
+                            return null;
+                        })}
                    </div>
-                   {message.type === 'user' && <User className="text-primary flex-shrink-0" />}
+
+                   {message.role === 'user' && <User className="text-primary flex-shrink-0" />}
                 </div>
               ))}
                {loading && (
