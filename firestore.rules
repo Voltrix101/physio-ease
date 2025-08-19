@@ -1,50 +1,41 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow admin users to read and write to the admins collection
-    match /admins/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    // Logged-in users can create appointments for themselves
+    match /appointments/{appointmentId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.patientId;
+      // Admins can do anything with appointments
+      allow read, update, delete: if request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
     }
     
-    // Public read access for treatments, products, and testimonials
+    // Admins can manage the admins collection
+    match /admins/{adminId} {
+      allow read, write: if request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Public collections can be read by anyone, but only written to by admins.
     match /treatments/{treatmentId} {
-      allow read: if true;
+      allow read: if request.auth == null || request.auth != null;
       allow write: if request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
     }
     match /products/{productId} {
-      allow read: if true;
+      allow read: if request.auth == null || request.auth != null;
       allow write: if request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
     }
      match /testimonials/{testimonialId} {
-      allow read: if true;
+      allow read: if request.auth == null || request.auth != null;
       allow write: if request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
     }
     
-    // Public read access for video categories and individual videos
-    match /categories/{categoryId} {
-        allow read: if true;
-        allow write: if request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
-    }
     match /videos/{videoId} {
-        allow read: if true;
-        allow write: if request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
+      allow read: if request.auth == null || request.auth != null;
+      allow write: if request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
     }
-
-    // Rules for appointments
-    match /appointments/{appointmentId} {
-      // Allow read access only to the user who created it or an admin
-      allow read: if request.auth != null && (request.auth.uid == resource.data.patientId || get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true);
-      
-      // Allow create only if the user is logged in and is creating it for themselves
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.patientId;
-
-      // Allow update only by an admin
-      allow update: if request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
-      
-      // Allow delete only by an admin
-      allow delete: if request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
+    
+    match /categories/{categoryId} {
+        allow read: if request.auth == null || request.auth != null;
+        allow write: if request.auth != null && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.isAdmin == true;
     }
   }
 }
