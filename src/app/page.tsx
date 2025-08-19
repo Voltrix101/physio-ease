@@ -86,6 +86,11 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <h2 className="text-3xl md:text-4xl font-headline tracking-tight text-center mb-12 text-[#2e4a3f]">Our Services</h2>
             <TreatmentCarousel treatments={treatments} />
+             <div className="mt-12 text-center">
+                <Button asChild variant="outline">
+                  <Link href="/services">View All Services</Link>
+                </Button>
+              </div>
           </div>
         </section>
 
