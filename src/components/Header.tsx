@@ -3,13 +3,15 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Stethoscope, LogOut, Menu } from 'lucide-react';
+import { Stethoscope, LogOut, Menu, Bell, UserCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ThemeToggle } from './ThemeToggle';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 
 export function Header() {
@@ -87,11 +89,38 @@ export function Header() {
                 <Button onClick={handleBookAppointmentClick} variant="accent" className="rounded-full bg-gradient-to-r from-[#ffb84d] to-[#ff9933] text-white hover:scale-105 transition-all">
                     Book Appointment
                 </Button>
-                 <ThemeToggle />
+                <ThemeToggle />
                 {!loading && user && (
-                     <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout" className="hover:bg-accent/20 dark:hover:bg-white/5">
-                        <LogOut className="h-5 w-5" />
+                  <div className='flex items-center gap-2'>
+                    <Button variant="ghost" size="icon" title="Notifications" className="hover:bg-accent/20 dark:hover:bg-white/5 relative">
+                      <Bell className="h-5 w-5" />
+                      {/* Optional: Notification badge */}
+                      {/* <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive"></span> */}
                     </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant='ghost' className='relative h-9 w-9 rounded-full hover:bg-accent/20 dark:hover:bg-white/5'>
+                            <Avatar className="h-8 w-8">
+                                <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName ?? "User"} />
+                                <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-56" align="end" forceMount>
+                        <DropdownMenuLabel className="font-normal">
+                          <div className="flex flex-col space-y-1">
+                            <p className="text-sm font-medium leading-none">{user.displayName ?? 'Doctor'}</p>
+                            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                          </div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                          <LogOut className="mr-2 h-4 w-4" />
+                          <span>Log out</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 )}
             </div>
           </>

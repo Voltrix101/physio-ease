@@ -2,97 +2,47 @@
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
 import { Header } from '@/components/Header';
 import { DashboardClient } from '@/components/dashboard/DashboardClient';
 import { Loader2 } from 'lucide-react';
-import { db } from '@/lib/firebase';
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import type { Appointment } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { user, loading: authLoading, isAdmin } = useAuth();
   const router = useRouter();
-  const { toast } = useToast();
-
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    // Wait until authentication is resolved before checking permissions
-    if (!authLoading) {
-      if (!user || !isAdmin) {
-        // Use replace to prevent the user from navigating back to the dashboard
-        router.replace('/login');
-      }
+    if (!authLoading && (!user || !isAdmin)) {
+      router.replace('/login');
     }
   }, [user, authLoading, isAdmin, router]);
 
-  useEffect(() => {
-    let unsubscribe: () => void = () => {};
-    if (user && isAdmin) {
-      setDataLoading(true);
-      try {
-        const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
-        unsubscribe = onSnapshot(q, (querySnapshot) => {
-          const appointmentsData = querySnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              date: data.date.toDate(), // Convert Firestore Timestamp to JS Date
-              createdAt: data.createdAt,
-            } as Appointment;
-          });
-          setAppointments(appointmentsData);
-          setDataLoading(false);
-        }, (error) => {
-          console.error("Error fetching appointments: ", error);
-          toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: 'Could not fetch appointments from the database.'
-          });
-          setDataLoading(false);
-        });
-      } catch (error) {
-        console.error("Firestore query error: ", error);
-         toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: 'Could not set up the appointment listener.'
-          });
-        setDataLoading(false);
-      }
-    } else {
-        // If the user is not an admin, we don't need to load data.
-        setDataLoading(false);
-    }
-    // Cleanup function
-    return () => unsubscribe();
-  }, [user, isAdmin, toast]);
-  
-  // Display a loader while auth state is resolving or data is being fetched.
-  if (authLoading || (!isAdmin && !dataLoading) || !user) {
+  if (authLoading || !user || !isAdmin) {
     return (
-        <div className="flex h-screen w-full items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen bg-secondary/50">
       <Header />
-      <main className="flex-1 container mx-auto py-8 px-4 md:px-6">
-        <div className="space-y-4 mb-8">
-          <h1 className="text-3xl font-bold tracking-tight font-headline">Doctor Dashboard</h1>
-          <p className="text-muted-foreground">Manage your appointments, treatments, and patients.</p>
-        </div>
-        <DashboardClient appointments={appointments} />
-      </main>
-    </>
+      <DashboardClient />
+    </div>
   );
+}
+
+// Use Suspense to handle the query parameter access on the client side
+export default function DashboardPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex h-screen w-full items-center justify-center bg-background">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        }>
+            <DashboardContent />
+        </Suspense>
+    );
 }
