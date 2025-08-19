@@ -22,7 +22,7 @@
     --muted: 40 5% 90%;
     --muted-foreground: 155 10% 40%;
     
-    --accent: 35 63% 65%; /* #e0a96d - Golden Tan */
+    --accent: 35 100% 65%; /* #ffb84d - Brighter Gold */
     --accent-foreground: 155 24% 15%;
 
     --destructive: 5 82% 76%; /* #f28c82 - Soft Coral */
@@ -36,6 +36,9 @@
     --ring: 175 24% 55%;
     
     --radius: 0.75rem;
+
+    --scrollbar-track: #f4f4f4;
+    --scrollbar-thumb: linear-gradient(180deg, #ffb84d, #ff9933);
   }
 
   .dark {
@@ -69,12 +72,20 @@
     --border: 145 15% 20%;
     --input: 145 15% 20%;
     --ring: 35 100% 65%;
+
+    --scrollbar-track: #121212;
+    --scrollbar-thumb: linear-gradient(180deg, #ffb84d, #ffad33);
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    scrollbar-width: thin;
+    scrollbar-color: #ffb84d var(--scrollbar-track);
+  }
+  html {
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground;
@@ -102,3 +113,37 @@
 .animate-fadeUp { animation: fadeUp 1.2s ease forwards; }
 .animate-riseUp { animation: riseUp 1.2s ease forwards; }
 .animate-slideDown { animation: slideDown 1s ease forwards; }
+
+/* Scrollbar Base */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  opacity: 0; /* start hidden */
+  transition: opacity 0.4s ease-in-out;
+}
+
+/* Fade in when scrolling */
+html:hover::-webkit-scrollbar,
+body:hover::-webkit-scrollbar,
+*::-webkit-scrollbar:hover {
+  opacity: 1;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 10px;
+}
+
+/* Thumb */
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 10px;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+/* Glow effect */
+::-webkit-scrollbar-thumb:hover {
+  filter: brightness(1.25);
+  opacity: 0.9;
+}
