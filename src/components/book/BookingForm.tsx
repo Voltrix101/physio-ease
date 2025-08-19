@@ -21,7 +21,7 @@ import { BookingSuccess } from './BookingSuccess';
 import { ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { createAppointment, State } from '@/app/book/actions';
+import { createAppointment, type CreateAppointmentResult } from '@/lib/appointments';
 
 const FormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -43,7 +43,8 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   
   const [paymentProofType, setPaymentProofType] = useState<'image'|'text'>('image');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formState, setFormState] = useState<State | null>(null);
+  const [submissionResult, setSubmissionResult] = useState<CreateAppointmentResult | null>(null);
+
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -69,64 +70,59 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
     });
   };
   
-  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
+ const handleFormSubmit = async (data: z.infer<typeof FormSchema>) => {
     if (!user) {
-        toast({ variant: 'destructive', title: 'Not logged in', description: 'Please log in to book an appointment.' });
-        return;
+      toast({ variant: 'destructive', title: 'Not logged in', description: 'Please log in to book an appointment.' });
+      return;
     }
 
     setIsSubmitting(true);
-
-    const formData = new FormData(e.currentTarget);
-    const paymentProofFile = formData.get('paymentProof') as File;
-    const paymentProofText = formData.get('paymentProofText') as string;
     
+    const paymentProofInput = document.getElementById(paymentProofType === 'image' ? 'paymentProof' : 'paymentProofText') as HTMLInputElement;
+
     let proofValue = '';
-    if (paymentProofType === 'image' && paymentProofFile && paymentProofFile.size > 0) {
-        proofValue = await readFileAsDataURL(paymentProofFile);
-    } else if (paymentProofType === 'text' && paymentProofText) {
-        proofValue = paymentProofText;
+    if (paymentProofType === 'image' && paymentProofInput.files && paymentProofInput.files[0]) {
+      proofValue = await readFileAsDataURL(paymentProofInput.files[0]);
+    } else if (paymentProofType === 'text') {
+      proofValue = paymentProofInput.value;
     }
     
     if (!proofValue) {
-        toast({ variant: 'destructive', title: 'Missing Proof', description: 'Please provide payment proof.' });
-        setIsSubmitting(false);
-        return;
+      toast({ variant: 'destructive', title: 'Missing Proof', description: 'Please provide payment proof.' });
+      setIsSubmitting(false);
+      return;
     }
     
-    const finalFormData = new FormData();
-    finalFormData.append('name', form.getValues('name'));
-    finalFormData.append('treatmentId', form.getValues('treatmentId'));
-    finalFormData.append('date', form.getValues('date').toISOString());
-    finalFormData.append('time', form.getValues('time'));
-    finalFormData.append('paymentProof', proofValue);
-    finalFormData.append('patientId', user.uid);
+    const result = await createAppointment({
+        name: data.name,
+        treatmentId: data.treatmentId,
+        date: data.date.toISOString(),
+        time: data.time,
+        paymentProof: proofValue,
+        userId: user.uid,
+    });
     
-    const result = await createAppointment(formState as State, finalFormData);
-    
-    setFormState(result);
+    setSubmissionResult(result);
     setIsSubmitting(false);
 
-     if (!result.success) {
-        toast({
-            variant: "destructive",
-            title: "Booking Failed",
-            description: result.message || 'An unknown error occurred.',
-        });
+    if (!result.success) {
+      toast({
+        variant: "destructive",
+        title: "Booking Failed",
+        description: result.message || 'An unknown error occurred.',
+      });
     }
-  }
+  };
 
 
-  if (formState?.success) {
+  if (submissionResult?.success) {
     return <BookingSuccess />;
   }
   
   return (
     <div className="space-y-8">
       <Progress value={(step / 3) * 100} className="w-full h-2 bg-secondary" />
-      <form onSubmit={handleFormSubmit} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
         {step === 1 && (
           <div className="space-y-4 animate-in fade-in-0 duration-500">
             <h3 className="text-xl font-headline">Step 1: Choose Your Service</h3>
@@ -227,7 +223,7 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
                     </AlertDescription>
                 </Alert>
             )}
-            {formState?.message && !formState.success && <p className="text-sm text-destructive mt-2">{formState.message}</p>}
+            {submissionResult?.message && !submissionResult.success && <p className="text-sm text-destructive mt-2">{submissionResult.message}</p>}
           </div>
         )}
       </form>
