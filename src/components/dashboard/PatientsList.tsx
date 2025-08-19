@@ -42,11 +42,14 @@ export function PatientsList() {
   useEffect(() => {
     const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const appointmentsData = querySnapshot.docs.map(doc => ({
+        const appointmentsData = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
             id: doc.id,
-            ...doc.data(),
-            date: (doc.data().date as Timestamp).toDate(),
-        } as Appointment));
+            ...data,
+            date: (data.date as Timestamp).toDate(), // Correctly convert Timestamp to Date
+          } as Appointment;
+        });
         setAppointments(appointmentsData);
         setLoading(false);
     }, (error) => {
@@ -63,36 +66,36 @@ export function PatientsList() {
   
   const patients = useMemo(() => {
     // This logic is corrected to properly group and aggregate patient data.
-    const patientData: { [key: string]: { name: string; appointments: Appointment[] } } = {};
+    const patientMap: { [key: string]: { name: string; appointments: Appointment[] } } = {};
 
-    // Group appointments by patientId
+    // 1. Group appointments by patientId
     appointments.forEach(app => {
-      if (!patientData[app.patientId]) {
-        patientData[app.patientId] = {
+      if (!patientMap[app.patientId]) {
+        patientMap[app.patientId] = {
           name: app.patientName,
           appointments: []
         };
       }
-      patientData[app.patientId].appointments.push(app);
+      patientMap[app.patientId].appointments.push(app);
     });
 
-    // Create the final patient records
-    const patientRecords: PatientRecord[] = Object.keys(patientData).map(patientId => {
-      const patient = patientData[patientId];
+    // 2. Create the final patient records from the map
+    const patientRecords: PatientRecord[] = Object.keys(patientMap).map(patientId => {
+      const patient = patientMap[patientId];
       // Sort appointments to find the most recent one
-      const sortedAppointments = [...patient.appointments].sort((a, b) => (b.date as Date).getTime() - (a.date as Date).getTime());
+      const sortedAppointments = [...patient.appointments].sort((a, b) => b.date.getTime() - a.date.getTime());
       const lastAppointment = sortedAppointments[0];
 
       return {
         id: patientId,
         name: patient.name,
         appointmentCount: patient.appointments.length,
-        lastVisit: lastAppointment.date as Date,
+        lastVisit: lastAppointment.date,
         treatmentName: lastAppointment.treatmentName,
       };
     });
 
-    // Sort patients by their last visit date (most recent first)
+    // 3. Sort patients by their last visit date (most recent first)
     return patientRecords.sort((a, b) => b.lastVisit.getTime() - a.lastVisit.getTime());
   }, [appointments]);
 
