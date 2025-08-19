@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Poppins, Playfair_Display } from 'next/font/google';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 
 const poppins = Poppins({
@@ -32,8 +33,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${poppins.variable} ${playfairDisplay.variable}`} suppressHydrationWarning>
       <body className="antialiased min-h-screen bg-background flex flex-col font-body">
-        {children}
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

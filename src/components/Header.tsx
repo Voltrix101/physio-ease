@@ -9,6 +9,7 @@ import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { ThemeToggle } from './ThemeToggle';
 
 
 export function Header() {
@@ -52,30 +53,33 @@ export function Header() {
         </Link>
         
         {isMobile ? (
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="bg-[#2e4a3f] text-white border-l-0">
-                <SheetHeader>
-                  <SheetTitle className="text-white font-headline text-2xl tracking-wide text-left">Menu</SheetTitle>
-                </SheetHeader>
-                <nav className="flex flex-col gap-6 text-lg mt-8">
-                  <SheetClose asChild><NavLinks /></SheetClose>
-                  <Button onClick={handleBookAppointmentClick} className="bg-[#e0a96d] text-black px-4 py-2 rounded-lg hover:bg-[#d18f50] hover:scale-105 transform transition mt-4">
-                    Book Appointment
-                  </Button>
-                   {user && (
-                    <Button variant="ghost" onClick={handleLogout} className="justify-start gap-2 text-lg">
-                        <LogOut className="h-5 w-5" /> Logout
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="bg-[#2e4a3f] text-white border-l-0">
+                  <SheetHeader>
+                    <SheetTitle className="text-white font-headline text-2xl tracking-wide text-left">Menu</SheetTitle>
+                  </SheetHeader>
+                  <nav className="flex flex-col gap-6 text-lg mt-8">
+                    <SheetClose asChild><NavLinks /></SheetClose>
+                    <Button onClick={handleBookAppointmentClick} className="bg-[#e0a96d] text-black px-4 py-2 rounded-lg hover:bg-[#d18f50] hover:scale-105 transform transition mt-4">
+                      Book Appointment
                     </Button>
-                  )}
-                </nav>
-            </SheetContent>
-          </Sheet>
+                     {user && (
+                      <Button variant="ghost" onClick={handleLogout} className="justify-start gap-2 text-lg">
+                          <LogOut className="h-5 w-5" /> Logout
+                      </Button>
+                    )}
+                  </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
         ) : (
           <>
             <nav className="hidden md:flex items-center gap-6 text-sm">
@@ -85,6 +89,7 @@ export function Header() {
                 <Button onClick={handleBookAppointmentClick} className="bg-[#e0a96d] text-black px-4 py-2 rounded-lg hover:bg-[#d18f50] hover:scale-105 transform transition">
                     Book Appointment
                 </Button>
+                 <ThemeToggle />
                 {!loading && user && (
                      <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout" className="hover:bg-white/10">
                         <LogOut className="h-5 w-5" />
