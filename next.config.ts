@@ -52,6 +52,24 @@ const nextConfig: NextConfig = {
         hostname: 'img.youtube.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'iili.io',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'physioease.firebasestorage.app',
+        port: '',
+        pathname: '/**',
       }
     ],
   },

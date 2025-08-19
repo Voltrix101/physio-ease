@@ -1,0 +1,74 @@
+[
+    {
+        "Name":"Manual Therapy",
+        "Description":"Hands-on techniques including joint mobilization, manipulation, and soft tissue massage to reduce pain and improve mobility.",
+        "Price (\u20b9)":500,
+        "Duration (mins)":30,
+        "Image URL":"https:\/\/placehold.co\/600x400.png",
+        "AI Image Hint":"physiotherapy manual therapy"
+    },
+    {
+        "Name":"Exercise Therapy",
+        "Description":"Customized strengthening, stretching, and balance exercises to restore movement and prevent injuries.",
+        "Price (\u20b9)":400,
+        "Duration (mins)":45,
+        "Image URL":"https:\/\/placehold.co\/600x400.png",
+        "AI Image Hint":"physiotherapy exercise training"
+    },
+    {
+        "Name":"Electrotherapy (TENS\/IFT)",
+        "Description":"Uses mild electrical currents to relieve pain, reduce inflammation, and stimulate healing.",
+        "Price (\u20b9)":600,
+        "Duration (mins)":20,
+        "Image URL":"https:\/\/placehold.co\/600x400.png",
+        "AI Image Hint":"physiotherapy electrotherapy"
+    },
+    {
+        "Name":"Ultrasound Therapy",
+        "Description":"High-frequency sound waves to reduce pain, improve blood flow, and accelerate tissue healing.",
+        "Price (\u20b9)":500,
+        "Duration (mins)":20,
+        "Image URL":"https:\/\/placehold.co\/600x400.png",
+        "AI Image Hint":"physiotherapy ultrasound therapy"
+    },
+    {
+        "Name":"Heat & Cold Therapy",
+        "Description":"Use of hot\/cold packs to reduce inflammation, relax muscles, and relieve pain.",
+        "Price (\u20b9)":300,
+        "Duration (mins)":15,
+        "Image URL":"https:\/\/placehold.co\/600x400.png",
+        "AI Image Hint":"physiotherapy hot cold therapy"
+    },
+    {
+        "Name":"Kinesio Taping",
+        "Description":"Elastic therapeutic tape applied to muscles and joints to provide support, reduce pain, and enhance movement.",
+        "Price (\u20b9)":400,
+        "Duration (mins)":20,
+        "Image URL":"https:\/\/placehold.co\/600x400.png",
+        "AI Image Hint":"physiotherapy kinesio taping"
+    },
+    {
+        "Name":"Traction Therapy",
+        "Description":"Spinal traction techniques to relieve pressure on spinal discs and nerves, especially for back and neck pain.",
+        "Price (\u20b9)":700,
+        "Duration (mins)":30,
+        "Image URL":"https:\/\/placehold.co\/600x400.png",
+        "AI Image Hint":"physiotherapy traction therapy"
+    },
+    {
+        "Name":"Dry Needling \/ Acupuncture",
+        "Description":"Fine needles inserted into trigger points to relieve muscle tightness and reduce pain.",
+        "Price (\u20b9)":800,
+        "Duration (mins)":25,
+        "Image URL":"https:\/\/placehold.co\/600x400.png",
+        "AI Image Hint":"physiotherapy dry needling acupuncture"
+    },
+    {
+        "Name":"Neurological Rehabilitation",
+        "Description":"Specialized exercises for stroke, spinal cord injury, and neurological conditions to restore movement and independence.",
+        "Price (\u20b9)":900,
+        "Duration (mins)":45,
+        "Image URL":"https:\/\/placehold.co\/600x400.png",
+        "AI Image Hint":"physiotherapy neurological rehab"
+    }
+]
