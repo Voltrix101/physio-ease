@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import type { Video } from "@/lib/types";
 import { db } from "@/lib/firebase";
-import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -18,9 +18,8 @@ type GroupedVideos = {
 };
 
 export default function VideosPage() {
-    const [videos, setVideos] = useState<Video[]>([]);
-    const [featuredVideos, setFeaturedVideos] = useState<Video[]>([]);
     const [groupedVideos, setGroupedVideos] = useState<GroupedVideos>({});
+    const [featuredVideos, setFeaturedVideos] = useState<Video[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -30,9 +29,8 @@ export default function VideosPage() {
                 const q = query(videosCol, orderBy('title'));
                 const snapshot = await getDocs(q);
                 const allVideos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Video));
-                setVideos(allVideos);
 
-                // Assuming the first 5 are featured for the carousel
+                // Use the first 5 videos as featured
                 setFeaturedVideos(allVideos.slice(0, 5));
 
                 const groups = allVideos.reduce((acc, video) => {
@@ -101,7 +99,7 @@ export default function VideosPage() {
                                                         </AspectRatio>
                                                         <div className="p-4 bg-card">
                                                             <h3 className="font-semibold text-primary truncate">{video.title}</h3>
-                                                            <p className="text-sm text-muted-foreground">{video.category}</p>
+                                                            <p className="text-sm text-muted-foreground">{video.category || 'General'}</p>
                                                         </div>
                                                     </div>
                                                 </Link>
@@ -119,7 +117,7 @@ export default function VideosPage() {
                     <section className="animate-fadeUp">
                          <h2 className="text-2xl font-headline text-primary mb-6 text-center">All Exercises</h2>
                          <Accordion type="single" collapsible className="w-full max-w-3xl mx-auto">
-                             {Object.entries(groupedVideos).map(([category, videoList]) => (
+                             {Object.entries(groupedVideos).sort(([a], [b]) => a.localeCompare(b)).map(([category, videoList]) => (
                                 <AccordionItem key={category} value={category}>
                                     <AccordionTrigger className="text-lg font-headline text-primary/90 hover:text-primary transition-colors py-4">
                                         {category} ({videoList.length})
