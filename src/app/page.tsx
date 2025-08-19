@@ -47,7 +47,7 @@ export default async function Home() {
           <div className="relative z-10 max-w-2xl px-4 animate-riseUp">
             <h1 className="text-4xl font-headline mb-4 tracking-wide text-white sm:text-5xl md:text-6xl">Restore. Revive. Renew.</h1>
             <p className="text-lg mb-6 text-white/90 md:text-xl">Personalized physiotherapy care by Dr. Amiya Ballav Roy</p>
-             <Button asChild size="lg" variant="accent" className="px-8 py-4 text-lg font-medium">
+             <Button asChild size="lg" variant="accent" className="px-8 py-4 text-lg font-medium rounded-full bg-gradient-to-r from-[#ffb84d] to-[#ff9933] text-white hover:scale-105 transition-all">
                 <Link href="/book">Book Appointment</Link>
             </Button>
           </div>
@@ -66,7 +66,10 @@ export default async function Home() {
         {/* Services Section */}
         <section id="services" className="w-full py-16 bg-secondary md:py-24">
           <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-headline tracking-tight text-center mb-12 text-foreground md:text-4xl">Our Services</h2>
+            <div className="text-center mb-12">
+                <h2 className="text-3xl font-headline tracking-tight text-foreground md:text-4xl">Our Physiotherapy Services</h2>
+                <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">We offer a comprehensive range of specialized treatments to address your specific needs and support your recovery.</p>
+            </div>
             <TreatmentCarousel treatments={treatments} />
              <div className="mt-12 text-center">
                 <Button asChild variant="outline">
@@ -95,7 +98,7 @@ export default async function Home() {
                       ))
                     ) : (
                       testimonials.map((testimonial) => (
-                          <Card key={testimonial.id} className="bg-card border-l-4 border-accent card-shadow hover:-translate-y-1">
+                          <Card key={testimonial.id} className="bg-card border-l-4 border-accent rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                               <CardHeader>
                                   <CardTitle className="font-body text-xl text-primary">{testimonial.name}</CardTitle>
                               </CardHeader>
@@ -110,7 +113,7 @@ export default async function Home() {
         </section>
 
       </main>
-      <footer className="bg-deep-highlight dark:bg-secondary text-deep-highlight-foreground py-6 border-t border-deep-highlight/50 dark:border-border">
+      <footer className="bg-deep-highlight dark:bg-card text-deep-highlight-foreground dark:text-primary-foreground py-6 border-t border-deep-highlight/50 dark:border-border">
         <div className="container text-center text-sm px-4 md:px-6">
           © {new Date().getFullYear()} PhysioEase Clinic. All rights reserved.
         </div>

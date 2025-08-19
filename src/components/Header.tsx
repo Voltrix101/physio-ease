@@ -19,8 +19,6 @@ export function Header() {
 
   const handleLogout = async () => {
     await auth.signOut();
-    // The useAuth hook will handle redirection automatically when the user state changes.
-    // This prevents a race condition and ensures a smooth, no-refresh experience.
     router.push('/');
   };
   
@@ -34,22 +32,22 @@ export function Header() {
 
   const NavLinks = ({ inSheet }: { inSheet?: boolean }) => (
     <>
-      <Link href="/" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>Home</Link>
-      <Link href="/services" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>Services</Link>
-      <Link href="/about" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>About</Link>
-      <Link href="/products" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>Products</Link>
-      <Link href="/videos" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>Videos</Link>
+      <Link href="/" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>Home</Link>
+      <Link href="/services" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>Services</Link>
+      <Link href="/about" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>About</Link>
+      <Link href="/products" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>Products</Link>
+      <Link href="/videos" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>Videos</Link>
       {user && isAdmin && (
-        <Link href="/dashboard" className={`${inSheet ? 'w-full' : ''} hover:text-accent transition`}>Dashboard</Link>
+        <Link href="/dashboard" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>Dashboard</Link>
       )}
     </>
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#2e4a3f] text-white dark:bg-[#121212]/80 dark:backdrop-blur-sm px-6 py-4 flex justify-between items-center shadow-md dark:shadow-black/20 animate-slideDown">
+    <header className="sticky top-0 z-50 w-full bg-card/80 dark:bg-[#121212]/80 text-foreground backdrop-blur-sm px-6 py-4 flex justify-between items-center shadow-md dark:shadow-black/20 animate-slideDown">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           <Stethoscope className="h-6 w-6 text-accent" />
-          <span className="font-headline text-2xl tracking-wide text-white">Pain Manage Clinic</span>
+          <span className="font-headline text-2xl tracking-wide">Pain Manage Clinic</span>
         </Link>
         
         {isMobile ? (
@@ -62,13 +60,13 @@ export function Header() {
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="bg-[#2e4a3f] dark:bg-[#121212] text-white border-l-0">
+              <SheetContent side="right" className="bg-card dark:bg-[#121212] text-foreground border-l">
                   <SheetHeader>
-                    <SheetTitle className="text-white font-headline text-2xl tracking-wide text-left">Menu</SheetTitle>
+                    <SheetTitle className="text-foreground font-headline text-2xl tracking-wide text-left">Menu</SheetTitle>
                   </SheetHeader>
                   <nav className="flex flex-col gap-6 text-lg mt-8">
                     <SheetClose asChild><NavLinks inSheet={true} /></SheetClose>
-                    <Button onClick={handleBookAppointmentClick} variant="accent" className="mt-4">
+                    <Button onClick={handleBookAppointmentClick} variant="accent" className="mt-4 rounded-full bg-gradient-to-r from-[#ffb84d] to-[#ff9933] text-white hover:scale-105 transition-all">
                       Book Appointment
                     </Button>
                      {user && (
@@ -86,12 +84,12 @@ export function Header() {
               <NavLinks />
             </nav>
             <div className="flex items-center gap-4">
-                <Button onClick={handleBookAppointmentClick} variant="accent">
+                <Button onClick={handleBookAppointmentClick} variant="accent" className="rounded-full bg-gradient-to-r from-[#ffb84d] to-[#ff9933] text-white hover:scale-105 transition-all">
                     Book Appointment
                 </Button>
                  <ThemeToggle />
                 {!loading && user && (
-                     <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout" className="hover:bg-white/10 dark:hover:bg-white/5">
+                     <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout" className="hover:bg-accent/20 dark:hover:bg-white/5">
                         <LogOut className="h-5 w-5" />
                     </Button>
                 )}

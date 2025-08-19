@@ -1,7 +1,6 @@
 
 import Image from 'next/image';
 import type { Treatment } from '@/lib/types';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Clock, Tag } from 'lucide-react';
@@ -12,40 +11,34 @@ interface TreatmentCardProps {
 
 export function TreatmentCard({ treatment }: TreatmentCardProps) {
   return (
-    <Card className="flex flex-col h-full overflow-hidden hover:-translate-y-1.5 rounded-lg bg-card card-shadow">
-      <CardHeader className="p-0">
-        <div className="relative h-48 w-full transition-transform duration-300 group-hover:scale-105">
-          <Image
-            src={treatment.imageUrl}
-            alt={treatment.name}
-            fill
-            style={{objectFit: 'cover'}}
-            className="rounded-t-lg"
-            data-ai-hint={treatment.dataAiHint}
-          />
-        </div>
-        <div className="p-6">
-          <CardTitle className="text-xl font-headline">{treatment.name}</CardTitle>
-          <CardDescription className="pt-2 text-base text-muted-foreground">{treatment.description}</CardDescription>
-        </div>
-      </CardHeader>
-      <CardContent className="flex-grow p-6 pt-0">
-        <div className="flex justify-between items-center text-sm">
+    <div className="bg-card rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full overflow-hidden">
+      <div className="relative h-48 w-full overflow-hidden">
+        <Image
+          src={treatment.imageUrl}
+          alt={treatment.name}
+          fill
+          style={{objectFit: 'cover'}}
+          className="group-hover:scale-105 transition-transform duration-300"
+          data-ai-hint={treatment.dataAiHint}
+        />
+      </div>
+      <div className="p-6 flex flex-col flex-grow">
+        <h3 className="text-xl font-headline font-semibold text-foreground">{treatment.name}</h3>
+        <p className="text-base text-muted-foreground mt-2 flex-grow">{treatment.description}</p>
+        <div className="flex justify-between items-center mt-4 text-base" style={{color: '#198754'}}>
             <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-green-600" />
-                <span className="font-semibold text-green-600 text-base">₹{treatment.price}</span>
+                <Tag className="h-4 w-4" />
+                <span className="font-semibold">₹{treatment.price}</span>
             </div>
             <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-green-600" />
-                <span className="font-semibold text-green-600 text-base">{treatment.duration} mins</span>
+                <Clock className="h-4 w-4" />
+                <span className="font-semibold">{treatment.duration} mins</span>
             </div>
         </div>
-      </CardContent>
-       <CardFooter className="p-6 pt-0 mt-auto">
-        <Button asChild className="w-full" variant="accent">
+        <Button asChild className="mt-6 w-full rounded-full bg-gradient-to-r from-[#ffb84d] to-[#ff9933] text-white py-2 font-medium hover:opacity-90 hover:scale-[1.02] transition-all duration-300">
           <Link href={`/book?treatment=${treatment.id}`}>Book Now</Link>
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

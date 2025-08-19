@@ -96,7 +96,7 @@
     @apply font-headline;
   }
   .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
-    @apply text-primary;
+    @apply text-primary-foreground;
   }
    h1, h2, h3, h4, h5, h6 {
     @apply text-foreground;
@@ -105,7 +105,7 @@
 
 @layer components {
     .card-shadow {
-        @apply shadow-[0_4px_15px_rgba(0,0,0,0.05)] transition-all duration-300 hover:shadow-xl;
+        @apply shadow-md hover:shadow-xl transition-all duration-300;
     }
     .dark .card-shadow {
         @apply shadow-[0_4px_15px_rgba(0,0,0,0.4)] transition-all duration-300 hover:shadow-[0_8px_25px_rgba(0,0,0,0.5)];
