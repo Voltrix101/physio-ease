@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -92,12 +93,12 @@ export function ProductsList() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <CardTitle>Products</CardTitle>
           <CardDescription>Manage affiliate products displayed on the public products page.</CardDescription>
         </div>
-        <Button onClick={handleAddNew}>
+        <Button onClick={handleAddNew} className="w-full sm:w-auto">
           <PlusCircle className="mr-2 h-4 w-4" />
           Add Product
         </Button>
@@ -108,13 +109,13 @@ export function ProductsList() {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         ) : (
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
+                  <TableHead className="min-w-[200px]">Name</TableHead>
                   <TableHead>Price (₹)</TableHead>
-                  <TableHead>Affiliate Link</TableHead>
+                  <TableHead className="min-w-[150px]">Affiliate Link</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -124,9 +125,9 @@ export function ProductsList() {
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>₹{product.price}</TableCell>
                     <TableCell>
-                        <Link href={product.affiliateUrl} target="_blank" className="text-primary hover:underline flex items-center gap-1">
+                        <Link href={product.affiliateUrl} target="_blank" className="text-primary hover:underline flex items-center gap-1 truncate">
                             <ExternalLink className="h-3 w-3" />
-                            Visit Link
+                            <span className="truncate">{product.affiliateUrl}</span>
                         </Link>
                     </TableCell>
                     <TableCell className="text-right">

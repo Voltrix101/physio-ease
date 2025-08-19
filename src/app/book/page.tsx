@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Header } from "@/components/Header";
@@ -9,6 +10,7 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function BookAppointmentPage() {
     const [treatments, setTreatments] = useState<Treatment[]>([]);
@@ -55,15 +57,14 @@ export default function BookAppointmentPage() {
         return (
             <div className="flex flex-col min-h-screen">
                 <Header />
-                <main className="flex-1 py-12 bg-secondary/50 flex items-center justify-center">
-                    <div className="text-center">
-                        <p className="text-red-600 mb-4">{error}</p>
-                        <button 
+                <main className="flex-1 py-12 bg-secondary/50 flex items-center justify-center text-center p-4">
+                    <div>
+                        <p className="text-destructive mb-4">{error}</p>
+                        <Button 
                             onClick={() => window.location.reload()} 
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                         >
                             Retry
-                        </button>
+                        </Button>
                     </div>
                 </main>
             </div>
@@ -72,11 +73,11 @@ export default function BookAppointmentPage() {
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
-            <main className="flex-1 py-12 bg-secondary/50">
+            <main className="flex-1 py-8 sm:py-12 bg-secondary/50">
                 <div className="container mx-auto px-4 md:px-6">
                     <Card className="max-w-3xl mx-auto shadow-lg">
-                        <CardHeader>
-                            <CardTitle className="text-2xl">Book Your Appointment</CardTitle>
+                        <CardHeader className="text-center sm:text-left">
+                            <CardTitle className="text-2xl md:text-3xl">Book Your Appointment</CardTitle>
                             <CardDescription>Complete the steps below to schedule your session with Dr. Amiya.</CardDescription>
                         </CardHeader>
                         <CardContent>

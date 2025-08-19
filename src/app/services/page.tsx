@@ -16,12 +16,12 @@ async function getTreatments(): Promise<Treatment[]> {
 export default async function ServicesPage() {
     const treatments = await getTreatments();
     return (
-        <div className="flex flex-col min-h-screen bg-[#faf8f3]">
+        <div className="flex flex-col min-h-screen bg-background">
             <Header />
             <main className="flex-1">
                 <section className="bg-secondary/50 py-12 md:py-20 animate-fadeUp">
                     <div className="container px-4 md:px-6 text-center">
-                        <h1 className="text-4xl font-headline tracking-tight text-[#2e4a3f] sm:text-5xl">
+                        <h1 className="text-3xl sm:text-4xl font-headline tracking-tight text-deep-highlight md:text-5xl">
                             Our Physiotherapy Services
                         </h1>
                         <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">
@@ -30,16 +30,18 @@ export default async function ServicesPage() {
                     </div>
                 </section>
 
-                <section className="py-16 px-6 md:px-20 animate-fadeUp">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
-                        {treatments.map(treatment => (
-                            <TreatmentCard key={treatment.id} treatment={treatment} />
-                        ))}
+                <section className="py-16 px-4 md:px-6 animate-fadeUp">
+                    <div className="container mx-auto">
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {treatments.map(treatment => (
+                                <TreatmentCard key={treatment.id} treatment={treatment} />
+                            ))}
+                        </div>
                     </div>
                 </section>
             </main>
              <footer className="bg-deep-highlight text-deep-highlight-foreground py-6 border-t border-deep-highlight/50">
-                <div className="container text-center text-sm">
+                <div className="container text-center text-sm px-4 md:px-6">
                 © {new Date().getFullYear()} PhysioEase Clinic. All rights reserved.
                 </div>
             </footer>

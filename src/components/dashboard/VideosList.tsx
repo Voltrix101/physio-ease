@@ -116,12 +116,12 @@ export function VideosList() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <CardTitle>Videos</CardTitle>
           <CardDescription>Manage embedded YouTube videos on the public videos page.</CardDescription>
         </div>
-        <Button onClick={handleAddNew}>
+        <Button onClick={handleAddNew} className="w-full sm:w-auto">
           <PlusCircle className="mr-2 h-4 w-4" />
           Add Video
         </Button>
@@ -140,12 +140,12 @@ export function VideosList() {
                 </Button>
             </div>
         ) : (
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Category</TableHead>
+                  <TableHead className="min-w-[200px]">Title</TableHead>
+                  <TableHead className="min-w-[150px]">Category</TableHead>
                   <TableHead>YouTube ID</TableHead>
                   <TableHead>Link</TableHead>
                   <TableHead className="text-right">Actions</TableHead>

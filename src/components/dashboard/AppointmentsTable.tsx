@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -46,16 +47,16 @@ export function AppointmentsTable({ appointments, onUpdate }: AppointmentsTableP
   }
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Patient</TableHead>
-            <TableHead>Treatment</TableHead>
-            <TableHead>Date & Time</TableHead>
+            <TableHead className="min-w-[150px]">Patient</TableHead>
+            <TableHead className="min-w-[150px]">Treatment</TableHead>
+            <TableHead className="min-w-[200px]">Date & Time</TableHead>
             <TableHead>Payment</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-right min-w-[150px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

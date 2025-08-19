@@ -49,11 +49,11 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#faf8f3]">
+    <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative h-[80vh] flex items-center justify-center text-center text-white animate-fadeIn">
+        <section className="relative h-[70vh] md:h-[80vh] flex items-center justify-center text-center text-white animate-fadeIn">
           <Image
             src="https://plus.unsplash.com/premium_photo-1663012948067-0478e4f9d9c6?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Physiotherapy session"
@@ -62,29 +62,29 @@ export default function Home() {
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30"></div>
-          <div className="relative z-10 max-w-2xl animate-riseUp">
-            <h1 className="text-5xl md:text-6xl font-headline mb-4 tracking-wide text-white">Restore. Revive. Renew.</h1>
+          <div className="relative z-10 max-w-2xl px-4 animate-riseUp">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-headline mb-4 tracking-wide text-white">Restore. Revive. Renew.</h1>
             <p className="text-lg md:text-xl mb-6 text-white/90">Personalized physiotherapy care by Dr. Amiya Ballav Roy</p>
-            <Button onClick={handleBookAppointmentClick} size="lg" className="bg-[#e0a96d] text-black px-6 py-3 rounded-lg text-lg font-medium hover:bg-[#d18f50] hover:scale-105 transform transition">
+            <Button onClick={handleBookAppointmentClick} size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-8 py-4 text-lg font-medium hover:scale-105 transform transition">
               Book Appointment
             </Button>
           </div>
         </section>
 
         {/* Doctor Profile Section */}
-        <section className="bg-[#faf8f3] py-16 px-6 md:px-20 text-center animate-fadeUp">
-          <Image src="https://i.postimg.cc/CxpzR9S8/Whats-App-Image-2025-08-15-at-23-45-01.jpg" alt="Dr. Amiya Ballav Roy" width={160} height={160} className="w-40 h-40 rounded-full mx-auto object-cover shadow-lg mb-6 hover:scale-105 transition"/>
-          <h2 className="text-3xl font-headline mb-2 text-[#2e4a3f]">Dr. Amiya Ballav Roy</h2>
-          <p className="text-[#70a8a3] font-medium mb-4">CDNT, CKTP, CCTS | Physiotherapist @ Pain Manage Clinic</p>
-          <p className="max-w-2xl mx-auto mb-6 text-muted-foreground">
+        <section className="bg-background py-16 px-4 md:px-6 text-center animate-fadeUp">
+          <Image src="https://i.postimg.cc/CxpzR9S8/Whats-App-Image-2025-08-15-at-23-45-01.jpg" alt="Dr. Amiya Ballav Roy" width={160} height={160} className="w-32 h-32 md:w-40 md:h-40 rounded-full mx-auto object-cover shadow-lg mb-6 hover:scale-105 transition"/>
+          <h2 className="text-3xl md:text-4xl font-headline mb-2 text-deep-highlight">Dr. Amiya Ballav Roy</h2>
+          <p className="text-primary font-medium mb-4">CDNT, CKTP, CCTS | Physiotherapist @ Pain Manage Clinic</p>
+          <p className="max-w-3xl mx-auto mb-6 text-muted-foreground">
             Specialist in Dry Needling, Taping, and Dry Cupping techniques with a focus on holistic pain management and recovery.
           </p>
         </section>
         
         {/* Services Section */}
-        <section id="services" className="w-full py-16 md:py-24 bg-background">
+        <section id="services" className="w-full py-16 md:py-24 bg-secondary/50">
           <div className="container px-4 md:px-6">
-            <h2 className="text-3xl md:text-4xl font-headline tracking-tight text-center mb-12 text-[#2e4a3f]">Our Services</h2>
+            <h2 className="text-3xl md:text-4xl font-headline tracking-tight text-center mb-12 text-deep-highlight">Our Services</h2>
             <TreatmentCarousel treatments={treatments} />
              <div className="mt-12 text-center">
                 <Button asChild variant="outline">
@@ -95,9 +95,9 @@ export default function Home() {
         </section>
 
         {/* Testimonials Section */}
-        <section id="testimonials" className="w-full py-16 md:py-24 bg-secondary">
+        <section id="testimonials" className="w-full py-16 md:py-24 bg-background">
             <div className="container px-4 md:px-6">
-                 <h2 className="text-3xl md:text-4xl font-headline tracking-tighter text-center mb-12 text-[#2e4a3f]">Patient Testimonials</h2>
+                 <h2 className="text-3xl md:text-4xl font-headline tracking-tight text-center mb-12 text-deep-highlight">Patient Testimonials</h2>
                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {[
                       {name: "Rohan S.", quote: "A wonderful experience. Dr. Amiya is very knowledgeable and caring. My back pain is completely gone!"},
@@ -119,7 +119,7 @@ export default function Home() {
 
       </main>
       <footer className="bg-deep-highlight text-deep-highlight-foreground py-6 border-t border-deep-highlight/50">
-        <div className="container text-center text-sm">
+        <div className="container text-center text-sm px-4 md:px-6">
           © {new Date().getFullYear()} PhysioEase Clinic. All rights reserved.
         </div>
       </footer>

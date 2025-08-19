@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -115,12 +116,12 @@ export function TreatmentsList() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <CardTitle>Treatments</CardTitle>
           <CardDescription>Add, edit, or remove physiotherapy treatments offered at the clinic.</CardDescription>
         </div>
-        <Button onClick={handleAddNew}>
+        <Button onClick={handleAddNew} className="w-full sm:w-auto">
           <PlusCircle className="mr-2 h-4 w-4" />
           Add Treatment
         </Button>
@@ -139,14 +140,14 @@ export function TreatmentsList() {
                 </Button>
             </div>
         ) : (
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Duration (mins)</TableHead>
-                  <TableHead>Price (₹)</TableHead>
+                  <TableHead className="min-w-[150px]">Name</TableHead>
+                  <TableHead className="min-w-[300px]">Description</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead>Price</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -155,7 +156,7 @@ export function TreatmentsList() {
                   <TableRow key={treatment.id}>
                     <TableCell className="font-medium">{treatment.name}</TableCell>
                     <TableCell className="max-w-[300px] truncate">{treatment.description}</TableCell>
-                    <TableCell>{treatment.duration}</TableCell>
+                    <TableCell>{treatment.duration} mins</TableCell>
                     <TableCell>₹{treatment.price}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>

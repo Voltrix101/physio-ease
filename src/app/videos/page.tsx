@@ -9,7 +9,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Loader2, PlayCircle } from "lucide-react";
 import ReactPlayer from 'react-player/youtube';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export default function VideosPage() {
     const [videos, setVideos] = useState<Video[]>([]);
@@ -33,6 +32,13 @@ export default function VideosPage() {
         getVideos();
     }, []);
 
+    useEffect(() => {
+        // Autoplay the first video when the list loads
+        if (videos.length > 0 && !currentVideo) {
+            setCurrentVideo(videos[0]);
+        }
+    }, [videos, currentVideo]);
+
     if (loading) {
         return (
              <div className="flex flex-col min-h-screen bg-background">
@@ -50,14 +56,14 @@ export default function VideosPage() {
         <main className="flex-1 py-12 md:py-16">
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center mb-12 animate-fadeUp">
-              <h1 className="text-4xl font-headline tracking-tight text-primary">Exercise & Wellness Videos</h1>
+              <h1 className="text-3xl sm:text-4xl font-headline tracking-tight text-primary md:text-5xl">Exercise & Wellness Videos</h1>
               <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
                 Watch these videos curated by Dr. Amiya to learn more about physiotherapy techniques, exercises, and self-care for pain management.
               </p>
             </div>
 
             {currentVideo && (
-              <section className="mb-12 rounded-xl bg-card shadow-2xl overflow-hidden p-4 border animate-fadeUp">
+              <section className="mb-12 rounded-xl bg-card shadow-2xl overflow-hidden p-2 sm:p-4 border animate-fadeUp">
                 <div className="aspect-video">
                   <ReactPlayer
                     url={`https://www.youtube.com/watch?v=${currentVideo.youtubeId}`}
@@ -67,17 +73,16 @@ export default function VideosPage() {
                     playing={true}
                   />
                 </div>
-                <div className="pt-4">
-                    <h2 className="text-2xl font-headline text-primary">{currentVideo.title}</h2>
-                    <p className="text-muted-foreground mt-1">{currentVideo.description}</p>
+                <div className="pt-4 px-2 sm:px-0">
+                    <h2 className="text-xl sm:text-2xl font-headline text-primary">{currentVideo.title}</h2>
+                    <p className="text-muted-foreground mt-1 text-sm sm:text-base">{currentVideo.description}</p>
                 </div>
               </section>
             )}
 
             {videos.length > 0 && (
               <section className="animate-fadeUp">
-                 {!currentVideo && <h3 className="text-2xl font-headline text-primary mb-6 text-center">Click a video to play</h3>}
-                 {currentVideo && <h3 className="text-2xl font-headline text-primary mb-6 text-center">More Exercises</h3>}
+                 <h3 className="text-2xl font-headline text-primary mb-6 text-center">More Exercises</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {videos.map((video) => (
                       <div
@@ -97,8 +102,8 @@ export default function VideosPage() {
                           </div>
                         </div>
                         <div className="p-4">
-                          <h4 className="font-semibold truncate text-foreground" title={video.title}>{video.title}</h4>
-                          <p className="text-sm text-muted-foreground">{video.category || 'General'}</p>
+                          <h4 className="font-semibold truncate text-foreground text-sm" title={video.title}>{video.title}</h4>
+                          <p className="text-xs text-muted-foreground">{video.category || 'General'}</p>
                         </div>
                       </div>
                     ))}
@@ -108,7 +113,7 @@ export default function VideosPage() {
           </div>
         </main>
         <footer className="bg-deep-highlight text-deep-highlight-foreground py-6 border-t border-deep-highlight/50 mt-16">
-          <div className="container text-center text-sm">
+          <div className="container text-center text-sm px-4 md:px-6">
             © {new Date().getFullYear()} PhysioEase Clinic. All rights reserved.
           </div>
         </footer>

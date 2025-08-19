@@ -22,8 +22,6 @@ import { ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { createAppointment, State } from '@/app/book/actions';
-import { useFormState } from 'react-dom';
-
 
 const FormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -160,11 +158,12 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
         {step === 2 && (
           <div className="space-y-4 animate-in fade-in-0 duration-500">
             <h3 className="text-xl font-headline">Step 2: Select Date & Time</h3>
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-2 gap-8 items-start">
                 <Controller name="date" control={form.control} render={({ field }) => (
-                    <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))} className="rounded-lg border" />
+                    <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))} className="rounded-lg border p-0 sm:p-3" />
                 )} />
                  <div className="space-y-4">
+                    <Label>Select a time slot</Label>
                     <Controller name="time" control={form.control} render={({ field }) => (
                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <SelectTrigger><SelectValue placeholder="Select a time slot" /></SelectTrigger>
@@ -235,4 +234,3 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
     </div>
   );
 }
-

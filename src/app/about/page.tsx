@@ -9,8 +9,8 @@ export default function AboutPage() {
       <Header />
       <main className="flex-1 py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div className="space-y-6 animate-fadeUp">
                 <h1 className="text-4xl lg:text-5xl font-headline text-primary leading-tight">
                     About Dr. Amiya Ballav Roy
                 </h1>
@@ -33,7 +33,7 @@ export default function AboutPage() {
                     <li><strong>CCTS (Certified in Dry Cupping Therapy):</strong> Proficient in using suction cups to promote healing, reduce pain, and improve blood flow.</li>
                 </ul>
             </div>
-            <div className="relative h-[500px] rounded-lg overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500">
+            <div className="relative h-[400px] md:h-[500px] rounded-lg overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500 animate-fadeUp">
                 <Image
                     src="https://i.postimg.cc/CxpzR9S8/Whats-App-Image-2025-08-15-at-23-45-01.jpg"
                     alt="Dr. Amiya Ballav Roy"
@@ -45,7 +45,7 @@ export default function AboutPage() {
         </div>
       </main>
       <footer className="bg-deep-highlight text-deep-highlight-foreground py-6 border-t border-deep-highlight/50">
-        <div className="container text-center text-sm">
+        <div className="container text-center text-sm px-4 md:px-6">
           © {new Date().getFullYear()} PhysioEase Clinic. All rights reserved.
         </div>
       </footer>
