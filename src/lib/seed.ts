@@ -97,13 +97,13 @@ const categoriesData = [
 
 const videosData = [
     // Back Pain
-    { id: 'cat-cow', title: 'Cat-Cow Stretch', categoryId: 'back-pain', youtubeId: 'z915K14nL8s', duration: '2:15', tags: ['back', 'spine', 'flexibility'], description: 'A gentle stretch to improve spine mobility and relieve tension.' },
-    { id: 'pelvic-tilts', title: 'Pelvic Tilts', categoryId: 'back-pain', youtubeId: 'z915K14nL8s', duration: '3:05', tags: ['back', 'core', 'stability'], description: 'Strengthens core muscles and helps stabilize the lower back.' },
+    { youtubeId: 'z915K14nL8s', title: 'Cat-Cow Stretch', categoryId: 'back-pain', duration: '2:15', tags: ['back', 'spine', 'flexibility'], description: 'A gentle stretch to improve spine mobility and relieve tension.' },
+    { youtubeId: 'z915K14nL8s', title: 'Pelvic Tilts', categoryId: 'back-pain', duration: '3:05', tags: ['back', 'core', 'stability'], description: 'Strengthens core muscles and helps stabilize the lower back.' },
     // Knee Pain
-    { id: 'isometric-quads', title: 'Isometric Quads', categoryId: 'knee-pain', youtubeId: 'z915K14nL8s', duration: '3:42', tags: ['knee', 'rehab', 'strength'], description: 'Activates the quadriceps muscles without moving the knee joint.' },
-    { id: 'straight-leg-raises', title: 'Straight Leg Raises', categoryId: 'knee-pain', youtubeId: 'z915K14nL8s', duration: '4:10', tags: ['knee', 'strength'], description: 'Builds strength in the quads to better support the knee.' },
+    { youtubeId: 'z915K14nL8s', title: 'Isometric Quads', categoryId: 'knee-pain', duration: '3:42', tags: ['knee', 'rehab', 'strength'], description: 'Activates the quadriceps muscles without moving the knee joint.' },
+    { youtubeId: 'z915K14nL8s', title: 'Straight Leg Raises', categoryId: 'knee-pain', duration: '4:10', tags: ['knee', 'strength'], description: 'Builds strength in the quads to better support the knee.' },
     // Neck & Shoulder
-    { id: 'neck-mobility-stretches', title: 'Neck Mobility Stretches', categoryId: 'neck-shoulder', youtubeId: 'z915K14nL8s', duration: '5:00', tags: ['neck', 'shoulder', 'stretch'], description: 'Increases range of motion and reduces stiffness in the neck and shoulders.' },
+    { youtubeId: 'z915K14nL8s', title: 'Neck Mobility Stretches', categoryId: 'neck-shoulder', duration: '5:00', tags: ['neck', 'shoulder', 'stretch'], description: 'Increases range of motion and reduces stiffness in the neck and shoulders.' },
 ];
 
 export async function seedTreatments() {
@@ -131,15 +131,18 @@ export async function seedVideosAndCategories() {
   const batch = writeBatch(db);
   
   categoriesData.forEach((category) => {
-    const { id, ...data } = category;
-    const docRef = doc(db, "categories", id);
-    batch.set(docRef, data);
+    const docRef = doc(categoriesCollection, category.id);
+    batch.set(docRef, category);
   });
   
   videosData.forEach((video) => {
-    const { id, ...data } = video;
-    const docRef = doc(db, "videos", id);
-    batch.set(docRef, data);
+    const docRef = doc(videosCollection); // auto-generate ID
+    const enrichedVideo = {
+        ...video,
+        url: `https://www.youtube.com/embed/${video.youtubeId}`,
+        thumbnail: `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`,
+    }
+    batch.set(docRef, enrichedVideo);
   });
 
   await batch.commit();

@@ -39,6 +39,8 @@ export interface Video {
     categoryId: string;
     duration?: string;
     tags?: string[];
+    url: string;
+    thumbnail: string;
 }
 
 export interface Testimonial {
