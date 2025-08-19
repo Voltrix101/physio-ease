@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -41,12 +40,18 @@ export default function LoginPage() {
   const { toast } = useToast();
 
   const handleAuthSuccess = async (user: User) => {
-    const adminDocRef = doc(db, 'admins', user.uid);
-    const adminDocSnap = await getDoc(adminDocRef);
-    if (adminDocSnap.exists() && adminDocSnap.data().isAdmin) {
-      router.push('/dashboard');
-    } else {
-      router.push('/book');
+    try {
+        const adminDocRef = doc(db, 'admins', user.uid);
+        const adminDocSnap = await getDoc(adminDocRef);
+        if (adminDocSnap.exists() && adminDocSnap.data().isAdmin) {
+            router.push('/dashboard');
+        } else {
+            router.push('/book');
+        }
+    } catch (error) {
+        console.error("Error checking admin status, proceeding as non-admin:", error);
+        // If checking admin status fails (e.g. permission denied), assume non-admin and proceed.
+        router.push('/book');
     }
   };
 
@@ -165,4 +170,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
