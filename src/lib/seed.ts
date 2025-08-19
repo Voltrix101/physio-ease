@@ -148,11 +148,12 @@ const videosData = [
 export async function seedTreatments() {
   const treatmentsCollection = collection(db, 'treatments');
   
-  const snapshot = await getDocs(treatmentsCollection);
-  if (!snapshot.empty) {
-    console.log('Treatments collection is not empty. Skipping seed.');
-    return;
-  }
+  // This check is removed to allow overwriting existing data.
+  // const snapshot = await getDocs(treatmentsCollection);
+  // if (!snapshot.empty) {
+  //   console.log('Treatments collection is not empty. Skipping seed.');
+  //   return;
+  // }
 
   const batch = writeBatch(db);
   treatmentsData.forEach((treatment) => {
