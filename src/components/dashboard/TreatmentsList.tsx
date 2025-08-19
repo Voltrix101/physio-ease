@@ -4,18 +4,20 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PlusCircle, MoreHorizontal, Loader2 } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Loader2, Database } from 'lucide-react';
 import type { Treatment } from '@/lib/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { TreatmentDialog } from './TreatmentDialog';
 import { useToast } from '@/hooks/use-toast';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { seedTreatments } from '@/lib/seed';
 
 
 export function TreatmentsList() {
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSeeding, setIsSeeding] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTreatment, setSelectedTreatment] = useState<Treatment | undefined>(undefined);
   const { toast } = useToast();
@@ -81,6 +83,26 @@ export function TreatmentsList() {
     }
   };
   
+  const handleSeed = async () => {
+    setIsSeeding(true);
+    try {
+        await seedTreatments();
+        toast({
+            title: "Database Seeded!",
+            description: "The initial list of treatments has been added."
+        });
+    } catch (error) {
+         toast({
+            variant: 'destructive',
+            title: 'Seeding Failed',
+            description: 'Could not add the initial treatments.'
+        });
+        console.error("Error seeding database: ", error);
+    } finally {
+        setIsSeeding(false);
+    }
+  }
+
   const handleEdit = (treatment: Treatment) => {
     setSelectedTreatment(treatment);
     setIsDialogOpen(true);
@@ -107,6 +129,14 @@ export function TreatmentsList() {
         {loading ? (
             <div className="flex justify-center items-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        ) : treatments.length === 0 ? (
+            <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                <p className="text-muted-foreground mb-4">Your treatments list is empty.</p>
+                <Button onClick={handleSeed} disabled={isSeeding}>
+                    {isSeeding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Database className="mr-2 h-4 w-4" />}
+                    {isSeeding ? 'Seeding...' : 'Seed Initial Treatments'}
+                </Button>
             </div>
         ) : (
           <div className="rounded-md border">
