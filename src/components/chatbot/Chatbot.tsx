@@ -8,7 +8,22 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { chat, type ChatInput, type ChatOutput } from '@/ai/flows/chat-flow';
 import toast from 'react-hot-toast';
-import type { Message, Part } from 'genkit';
+
+// Define our own Message interface to match what we actually need
+interface ChatMessage {
+  role: 'user' | 'model';
+  content: Array<{
+    text?: string;
+    toolRequest?: {
+      name: string;
+      input: any;
+    };
+    toolResponse?: {
+      name: string;
+      output: any;
+    };
+  }>;
+}
 
 // We define a more specific type for the content parts we expect to handle
 interface HandledPart {
@@ -25,7 +40,7 @@ interface HandledPart {
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -48,19 +63,19 @@ export function Chatbot() {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
-    const userMessage: Message = { role: 'user', content: [{ text: input }] };
+    const userMessage: ChatMessage = { role: 'user', content: [{ text: input }] };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput('');
     setLoading(true);
 
     try {
-        const result = await chat({ messages: newMessages });
-        setMessages(result.history);
+        const result = await chat({ history: newMessages as any });
+        setMessages(result.history as any);
     } catch (error) {
         console.error("Error calling chat flow:", error);
         toast.error("I'm sorry, I encountered an error. Please try again.");
-        const errorMessage: Message = { 
+        const errorMessage: ChatMessage = { 
             role: 'model',
             content: [{ text: "I'm having trouble connecting right now. Please try again in a moment."}]
         };
@@ -70,7 +85,7 @@ export function Chatbot() {
     }
   };
 
-  const renderContentPart = (part: Part, index: number) => {
+  const renderContentPart = (part: HandledPart, index: number) => {
       const handledPart = part as HandledPart;
       if (handledPart.text) {
           return <p key={index} className="text-sm">{handledPart.text}</p>;
@@ -123,10 +138,6 @@ export function Chatbot() {
 
             <div className="flex-1 p-4 overflow-y-auto space-y-4">
               {messages.map((message, index) => {
-                // We only want to display messages from the user or the model.
-                // Tool responses are handled within the model's message content.
-                if (message.role === 'tool') return null;
-
                 return (
                     <div key={index} className={`flex items-start gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
                       {message.role === 'model' && <Bot className="text-primary flex-shrink-0" />}

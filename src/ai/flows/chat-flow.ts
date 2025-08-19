@@ -15,7 +15,7 @@ import type { Message } from 'genkit';
 
 // Define the input schema for the chat flow, which is a history of messages.
 const ChatInputSchema = z.object({
-  messages: z.array(z.custom<Message>()),
+  history: z.array(z.custom<Message>()),
 });
 export type ChatInput = z.infer<typeof ChatInputSchema>;
 
@@ -43,11 +43,16 @@ const chatFlow = ai.defineFlow(
     outputSchema: ChatOutputSchema,
   },
   async (input) => {
-    const { history } = await ai.generate({
-      // Provide the model with the tool(s) it can use.
+    // Validate input
+    if (!input || !input.history || !Array.isArray(input.history)) {
+      throw new Error('Invalid input: history array is required');
+    }
+
+    const response = await ai.generate({
+      model: 'googleai/gemini-2.0-flash',
       tools: [suggestTreatmentTool],
-      history: input.messages,
-      prompt: `You are PhysioBot, a friendly and helpful physiotherapy clinic assistant.
+      messages: input.history,
+      system: `You are PhysioBot, a friendly and helpful physiotherapy clinic assistant.
       
       Your personality is:
       - **Polite & Empathetic**: Always be polite and show empathy for the user's condition.
@@ -62,6 +67,15 @@ const chatFlow = ai.defineFlow(
       `,
     });
 
-    return { history };
+    // Create the assistant's response message
+    const assistantMessage = {
+      role: 'model' as const,
+      content: response.candidates?.[0]?.content?.parts || [{ text: response.text || "I'm sorry, I couldn't process that request." }]
+    };
+
+    // Build updated history
+    const updatedHistory = [...input.history, assistantMessage];
+    
+    return { history: updatedHistory };
   }
 );
