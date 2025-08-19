@@ -10,15 +10,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Product } from '@/lib/types';
-import { generateImage } from '@/ai/flows/generate-image-flow';
-import { Loader2, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const productSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
   price: z.coerce.number().min(0, 'Price cannot be negative'),
   affiliateUrl: z.string().url('Must be a valid affiliate URL'),
-  imageUrl: z.string().min(1, 'Image is required.'), // Can be URL or data URI
+  imageUrl: z.string().url('Must be a valid URL.'),
   dataAiHint: z.string().optional(),
 });
 
@@ -36,10 +34,8 @@ export function ProductDialog({ isOpen, setIsOpen, onSave, product }: ProductDia
     resolver: zodResolver(productSchema),
   });
   
-  const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
   const watchedImageUrl = watch('imageUrl');
-  const watchedPrompt = watch('dataAiHint');
 
   useEffect(() => {
     if (isOpen) {
@@ -57,23 +53,6 @@ export function ProductDialog({ isOpen, setIsOpen, onSave, product }: ProductDia
     }
   }, [product, reset, isOpen]);
 
-  const handleGenerateImage = async () => {
-      if (!watchedPrompt) {
-        toast({ variant: 'destructive', title: 'Prompt is empty', description: 'Please enter a prompt to generate an image.' });
-        return;
-      }
-      setIsGenerating(true);
-      try {
-        const result = await generateImage({ prompt: watchedPrompt });
-        setValue('imageUrl', result.imageUrl, { shouldValidate: true });
-        toast({ title: 'Image Generated!', description: 'The image has been successfully generated.' });
-      } catch (error) {
-        console.error("Image generation failed:", error);
-        toast({ variant: 'destructive', title: 'Generation Failed', description: 'Could not generate the image.' });
-      } finally {
-        setIsGenerating(false);
-      }
-  };
 
   const onSubmit = (data: ProductFormData) => {
     onSave(data);
@@ -104,15 +83,15 @@ export function ProductDialog({ isOpen, setIsOpen, onSave, product }: ProductDia
             <Input id="affiliateUrl" {...register('affiliateUrl')} />
             {errors.affiliateUrl && <p className="text-red-500 text-xs">{errors.affiliateUrl.message}</p>}
           </div>
-           <div className="space-y-2">
-            <Label htmlFor="dataAiHint">Image Generation Prompt</Label>
-            <div className="flex items-center gap-2">
-                <Input id="dataAiHint" {...register('dataAiHint')} placeholder="e.g. photorealistic, physiotherapy equipment" />
-                <Button type="button" onClick={handleGenerateImage} disabled={isGenerating}>
-                  {isGenerating ? <Loader2 className="animate-spin" /> : <Wand2 />}
-                  Generate
-                </Button>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="imageUrl">Image URL</Label>
+            <Input id="imageUrl" {...register('imageUrl')} placeholder="https://your-image-host.com/image.png" />
+            {errors.imageUrl && <p className="text-red-500 text-xs">{errors.imageUrl.message}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="dataAiHint">AI Image Hint</Label>
+            <Input id="dataAiHint" {...register('dataAiHint')} placeholder="e.g. physiotherapy equipment" />
+             <p className="text-xs text-muted-foreground">Add keywords for future AI image sourcing.</p>
           </div>
           <div className="space-y-2">
             <Label>Image Preview</Label>
@@ -121,9 +100,6 @@ export function ProductDialog({ isOpen, setIsOpen, onSave, product }: ProductDia
                 <Image src={watchedImageUrl} alt="Generated image preview" fill style={{ objectFit: 'cover' }} />
               )}
             </div>
-             {/* The imageUrl is now managed by the form state, no need for a visible input */}
-             <Input id="imageUrl" {...register('imageUrl')} type="hidden" />
-             {errors.imageUrl && <p className="text-red-500 text-xs">{errors.imageUrl.message}</p>}
           </div>
 
           <DialogFooter>
