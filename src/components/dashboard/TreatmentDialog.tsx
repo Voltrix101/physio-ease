@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import type { Treatment } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { generateImage } from '@/ai/flows/generate-image-flow';
+import { generateImage, GenerateImage } from '@/ai/flows/generate-image-flow';
 import { Loader2, Sparkles } from 'lucide-react';
 
 
