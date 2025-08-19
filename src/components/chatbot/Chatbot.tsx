@@ -5,16 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, Send, X, Bot, User, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { chat, ChatInput, ChatOutput } from '@/ai/flows/chat-flow';
+import { chat, type ChatInput, type ChatOutput } from '@/ai/flows/chat-flow';
 import toast from 'react-hot-toast';
+import type { Message, Part } from 'genkit';
 
-interface Message {
-  role: 'user' | 'model' | 'tool';
-  content: ContentPart[];
-}
-
-interface ContentPart {
+// We define a more specific type for the content parts we expect to handle
+interface HandledPart {
     text?: string;
+    toolRequest?: {
+        name: string;
+        input: any;
+    };
     toolResponse?: {
         name: string;
         output: any;
@@ -54,13 +55,7 @@ export function Chatbot() {
 
     try {
         const result = await chat({ messages: newMessages });
-        
-        const botMessage: Message = { 
-            role: 'model',
-            content: result.history[result.history.length - 1].content
-        };
-        setMessages(prev => [...prev, botMessage]);
-
+        setMessages(result.history);
     } catch (error) {
         console.error("Error calling chat flow:", error);
         toast.error("I'm sorry, I encountered an error. Please try again.");
@@ -73,6 +68,31 @@ export function Chatbot() {
         setLoading(false);
     }
   };
+
+  const renderContentPart = (part: Part, index: number) => {
+      const handledPart = part as HandledPart;
+      if (handledPart.text) {
+          return <p key={index} className="text-sm">{handledPart.text}</p>;
+      }
+      if (handledPart.toolResponse && handledPart.toolResponse.name === 'suggestTreatmentTool') {
+          const output = handledPart.toolResponse.output;
+          return (
+              <div key={index} className="mt-3 space-y-2">
+                  <p className="font-semibold text-sm">Would you like to book one of these treatments?</p>
+                  {output.recommendations.map((rec: any) => (
+                      <Button asChild key={rec.id} size="sm" className="w-full justify-start" variant="secondary">
+                          <Link href={`/book?treatment=${rec.id}`}>Book {rec.name}</Link>
+                      </Button>
+                  ))}
+              </div>
+          );
+      }
+      // Silently ignore toolRequest parts as they are not meant for display
+      if (handledPart.toolRequest) {
+          return null;
+      }
+      return <p key={index} className="text-sm text-red-500">[Unsupported content type]</p>;
+  }
 
   return (
     <>
@@ -101,35 +121,23 @@ export function Chatbot() {
             </header>
 
             <div className="flex-1 p-4 overflow-y-auto space-y-4">
-              {messages.map((message, index) => (
-                <div key={index} className={`flex items-start gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
-                   {message.role === 'model' && <Bot className="text-primary flex-shrink-0" />}
-                   
-                   <div className={`rounded-lg p-3 max-w-xs ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                        {message.content.map((part, partIndex) => {
-                            if (part.text) {
-                                return <p key={partIndex} className="text-sm">{part.text}</p>;
-                            }
-                            if (part.toolResponse && part.toolResponse.name === 'suggestTreatmentTool') {
-                                const output = part.toolResponse.output;
-                                return (
-                                    <div key={partIndex} className="mt-3 space-y-2">
-                                        <p className="font-semibold text-sm">Would you like to book one of these treatments?</p>
-                                        {output.recommendations.map((rec: any) => (
-                                            <Button asChild key={rec.id} size="sm" className="w-full justify-start" variant="secondary">
-                                                <Link href={`/book?treatment=${rec.id}`}>Book {rec.name}</Link>
-                                            </Button>
-                                        ))}
-                                    </div>
-                                );
-                            }
-                            return null;
-                        })}
-                   </div>
+              {messages.map((message, index) => {
+                // We only want to display messages from the user or the model.
+                // Tool responses are handled within the model's message content.
+                if (message.role === 'tool') return null;
 
-                   {message.role === 'user' && <User className="text-primary flex-shrink-0" />}
-                </div>
-              ))}
+                return (
+                    <div key={index} className={`flex items-start gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
+                      {message.role === 'model' && <Bot className="text-primary flex-shrink-0" />}
+                      
+                      <div className={`rounded-lg p-3 max-w-xs ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                          {message.content.map(renderContentPart)}
+                      </div>
+
+                      {message.role === 'user' && <User className="text-primary flex-shrink-0" />}
+                    </div>
+                )
+              })}
                {loading && (
                     <div className="flex items-start gap-3">
                         <Bot className="text-primary flex-shrink-0" />
