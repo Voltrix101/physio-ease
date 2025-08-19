@@ -56,7 +56,7 @@ export default async function Home() {
         {/* Doctor Profile Section */}
         <section className="bg-background py-16 px-4 text-center animate-fadeUp md:px-6">
           <Image src="https://i.postimg.cc/CxpzR9S8/Whats-App-Image-2025-08-15-at-23-45-01.jpg" alt="Dr. Amiya Ballav Roy" width={160} height={160} className="w-32 h-32 md:w-40 md:h-40 rounded-full mx-auto object-cover shadow-lg mb-6 hover:scale-105 transition"/>
-          <h2 className="text-3xl font-headline mb-2 text-deep-highlight md:text-4xl">Dr. Amiya Ballav Roy</h2>
+          <h2 className="text-3xl font-headline mb-2 text-foreground md:text-4xl">Dr. Amiya Ballav Roy</h2>
           <p className="text-primary font-medium mb-4">CDNT, CKTP, CCTS | Physiotherapist @ Pain Manage Clinic</p>
           <p className="max-w-3xl mx-auto mb-6 text-muted-foreground">
             Specialist in Dry Needling, Taping, and Dry Cupping techniques with a focus on holistic pain management and recovery.
@@ -66,7 +66,7 @@ export default async function Home() {
         {/* Services Section */}
         <section id="services" className="w-full py-16 bg-secondary md:py-24">
           <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-headline tracking-tight text-center mb-12 text-deep-highlight md:text-4xl">Our Services</h2>
+            <h2 className="text-3xl font-headline tracking-tight text-center mb-12 text-foreground md:text-4xl">Our Services</h2>
             <TreatmentCarousel treatments={treatments} />
              <div className="mt-12 text-center">
                 <Button asChild variant="outline">
@@ -79,11 +79,11 @@ export default async function Home() {
         {/* Testimonials Section */}
         <section id="testimonials" className="w-full py-16 bg-background md:py-24">
             <div className="container px-4 md:px-6">
-                 <h2 className="text-3xl font-headline tracking-tight text-center mb-12 text-deep-highlight md:text-4xl">Patient Testimonials</h2>
+                 <h2 className="text-3xl font-headline tracking-tight text-center mb-12 text-foreground md:text-4xl">Patient Testimonials</h2>
                  <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                     {testimonials.length === 0 ? (
                       Array.from({ length: 3 }).map((_, i) => (
-                        <Card key={i} className="bg-card border-l-4 border-accent shadow-md dark:card-shadow">
+                        <Card key={i} className="bg-card border-l-4 border-accent card-shadow">
                             <CardHeader>
                                <Skeleton className="h-6 w-1/2" />
                             </CardHeader>
@@ -95,7 +95,7 @@ export default async function Home() {
                       ))
                     ) : (
                       testimonials.map((testimonial) => (
-                          <Card key={testimonial.id} className="bg-card border-l-4 border-accent shadow-md dark:card-shadow transition-all hover:shadow-xl hover:-translate-y-1">
+                          <Card key={testimonial.id} className="bg-card border-l-4 border-accent card-shadow hover:-translate-y-1">
                               <CardHeader>
                                   <CardTitle className="font-body text-xl text-primary">{testimonial.name}</CardTitle>
                               </CardHeader>

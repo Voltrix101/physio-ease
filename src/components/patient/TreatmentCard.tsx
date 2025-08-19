@@ -12,9 +12,9 @@ interface TreatmentCardProps {
 
 export function TreatmentCard({ treatment }: TreatmentCardProps) {
   return (
-    <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 rounded-lg border bg-card dark:card-shadow">
+    <Card className="flex flex-col h-full overflow-hidden hover:-translate-y-1.5 rounded-lg bg-card card-shadow">
       <CardHeader className="p-0">
-        <div className="relative h-48 w-full">
+        <div className="relative h-48 w-full transition-transform duration-300 group-hover:scale-105">
           <Image
             src={treatment.imageUrl}
             alt={treatment.name}
@@ -25,19 +25,19 @@ export function TreatmentCard({ treatment }: TreatmentCardProps) {
           />
         </div>
         <div className="p-6">
-          <CardTitle className="text-xl font-headline text-primary">{treatment.name}</CardTitle>
+          <CardTitle className="text-xl font-headline">{treatment.name}</CardTitle>
           <CardDescription className="pt-2 text-base text-muted-foreground">{treatment.description}</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="flex-grow p-6 pt-0">
-        <div className="flex justify-between items-center text-sm text-muted-foreground">
+        <div className="flex justify-between items-center text-sm">
             <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-primary" />
-                <span className="font-semibold text-primary/90 text-base">₹{treatment.price}</span>
+                <Tag className="h-4 w-4 text-green-600" />
+                <span className="font-semibold text-green-600 text-base">₹{treatment.price}</span>
             </div>
             <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-primary" />
-                <span className="font-semibold text-primary/90 text-base">{treatment.duration} mins</span>
+                <Clock className="h-4 w-4 text-green-600" />
+                <span className="font-semibold text-green-600 text-base">{treatment.duration} mins</span>
             </div>
         </div>
       </CardContent>
