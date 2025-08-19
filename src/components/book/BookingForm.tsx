@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import Link from 'next/link';
 
 import type { Treatment } from '@/lib/types';
@@ -43,7 +43,7 @@ export function BookingForm({ treatments }: { treatments: Treatment[] }) {
   const { toast } = useToast();
 
   const initialState = { message: null, errors: {}, success: false };
-  const [state, dispatch] = useFormState(createAppointment, initialState);
+  const [state, dispatch] = useActionState(createAppointment, initialState);
 
   useEffect(() => {
     setName(user?.displayName || '');

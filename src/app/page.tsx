@@ -3,26 +3,36 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/Header';
-import { TreatmentCarousel } from '@/components/patient/TreatmentCarousel';
+import { TreatmentCarousel } from '@/components/ClientTreatmentCarousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import type { Treatment, Testimonial } from '@/lib/types';
-import { Skeleton } from '@/components/ui/skeleton';
-
+import { Suspense } from 'react';
 
 async function getTreatments(): Promise<Treatment[]> {
-    const treatmentsCol = collection(db, 'treatments');
-    const q = query(treatmentsCol, orderBy('name'));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Treatment));
+    try {
+        const treatmentsCol = collection(db, 'treatments');
+        const q = query(treatmentsCol, orderBy('name'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Treatment));
+    } catch (error) {
+        console.warn('Failed to load treatments:', error);
+        return []; // Return empty array instead of crashing
+    }
 }
 
 async function getTestimonials(): Promise<Testimonial[]> {
-    const testimonialsCol = collection(db, 'testimonials');
-    const q = query(testimonialsCol, orderBy('name'));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+    try {
+        const testimonialsCol = collection(db, 'testimonials');
+        const q = query(testimonialsCol, orderBy('name'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+    } catch (error) {
+        console.warn('Failed to load testimonials:', error);
+        return []; // Return empty array instead of crashing
+    }
 }
 
 

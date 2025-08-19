@@ -1,178 +1,236 @@
 
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState, useCallback, memo } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, Send, X, Bot, User, Loader2 } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { chat, type ChatInput, type ChatOutput } from '@/ai/flows/chat-flow';
-import toast from 'react-hot-toast';
 
-// Define our own Message interface to match what we actually need
-interface ChatMessage {
-  role: 'user' | 'model';
-  content: Array<{
-    text?: string;
-    toolRequest?: {
-      name: string;
-      input: any;
-    };
-    toolResponse?: {
-      name: string;
-      output: any;
-    };
-  }>;
-}
+type Msg = { 
+  role: "bot" | "user"; 
+  text: string; 
+  cta?: { label: string; url: string } | null;
+  recommendations?: Array<{ name: string; id: string }>;
+};
 
-// We define a more specific type for the content parts we expect to handle
-interface HandledPart {
-    text?: string;
-    toolRequest?: {
-        name: string;
-        input: any;
-    };
-    toolResponse?: {
-        name: string;
-        output: any;
-    };
-}
+const QUICK = ["Start Consultation", "Back Pain", "Neck Pain", "Knee Pain", "Shoulder Pain", "Posture Issue"];
+
+// Memoize the message component to prevent unnecessary re-renders
+const MessageComponent = memo(({ message, index }: { message: Msg; index: number }) => (
+  <div key={index} className={message.role === "user" ? "text-right" : "text-left"}>
+    <div className={`flex gap-2 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+      {message.role === "bot" && <Bot className="text-primary flex-shrink-0 mt-1" size={16} />}
+      
+      <div
+        className={
+          "inline-block max-w-[85%] whitespace-pre-wrap rounded-lg px-3 py-2 " +
+          (message.role === "user"
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted text-muted-foreground")
+        }
+      >
+        {message.text}
+      </div>
+
+      {message.role === "user" && <User className="text-primary flex-shrink-0 mt-1" size={16} />}
+    </div>
+
+    {/* CTA Button */}
+    {message.cta && message.role === "bot" && (
+      <div className="mt-2 flex justify-start">
+        <Link
+          href={message.cta.url}
+          className="inline-block rounded-lg bg-primary text-primary-foreground text-sm px-3 py-1.5 hover:opacity-90 transition"
+        >
+          {message.cta.label}
+        </Link>
+      </div>
+    )}
+
+    {/* Recommendations */}
+    {message.recommendations && message.recommendations.length > 0 && message.role === "bot" && (
+      <div className="mt-2 space-y-1">
+        {message.recommendations.slice(0, 3).map((rec, idx) => (
+          <div key={idx} className="text-left">
+            <Link
+              href={`/book?treatment=${rec.id}`}
+              className="inline-block text-xs rounded-md bg-secondary text-secondary-foreground px-2 py-1 hover:bg-secondary/80 transition"
+            >
+              Book {rec.name}
+            </Link>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+));
+
+MessageComponent.displayName = 'MessageComponent';
 
 export function Chatbot() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [open, setOpen] = useState(false);
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<Msg[]>([
+    { 
+      role: "bot", 
+      text: "👋 Hi, I'm your Physiotherapy Assistant. Describe your problem or use the quick buttons below." 
+    },
+  ]);
+  const [lastCategory, setLastCategory] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(scrollToBottom, [messages]);
-  
-   useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      setMessages([
-        { role: 'model', content: [{ text: "Hello! I'm PhysioBot. How can I help you today? Feel free to describe any symptoms you're experiencing." }] }
-      ]);
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ 
+        top: scrollRef.current.scrollHeight, 
+        behavior: "smooth" 
+      });
     }
-   }, [isOpen, messages.length]);
+  }, [messages, open]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || loading) return;
-
-    const userMessage: ChatMessage = { role: 'user', content: [{ text: input }] };
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
-    setInput('');
+  const send = useCallback(async (text: string) => {
+    if (!text.trim() || loading) return;
+    
+    const userMsg: Msg = { role: "user", text };
+    setMessages(m => [...m, userMsg]);
     setLoading(true);
 
     try {
-        const result = await chat({ history: newMessages as any });
-        setMessages(result.history as any);
-    } catch (error) {
-        console.error("Error calling chat flow:", error);
-        toast.error("I'm sorry, I encountered an error. Please try again.");
-        const errorMessage: ChatMessage = { 
-            role: 'model',
-            content: [{ text: "I'm having trouble connecting right now. Please try again in a moment."}]
-        };
-        setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-        setLoading(false);
-    }
-  };
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, context: { lastCategory } }),
+      });
 
-  const renderContentPart = (part: HandledPart, index: number) => {
-      const handledPart = part as HandledPart;
-      if (handledPart.text) {
-          return <p key={index} className="text-sm">{handledPart.text}</p>;
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
       }
-      if (handledPart.toolResponse && handledPart.toolResponse.name === 'suggestTreatmentTool') {
-          const output = handledPart.toolResponse.output;
-          return (
-              <div key={index} className="mt-3 space-y-2">
-                  <p className="font-semibold text-sm">Would you like to book one of these treatments?</p>
-                  {output.recommendations.map((rec: any) => (
-                      <Button asChild key={rec.id} size="sm" className="w-full justify-start" variant="secondary">
-                          <Link href={`/book?treatment=${rec.id}`}>Book {rec.name}</Link>
-                      </Button>
-                  ))}
-              </div>
-          );
-      }
-      // Silently ignore toolRequest parts as they are not meant for display
-      if (handledPart.toolRequest) {
-          return null;
-      }
-      return <p key={index} className="text-sm text-red-500">[Unsupported content type]</p>;
-  }
+
+      const data = await res.json();
+
+      setLastCategory(data?.context?.lastCategory ?? lastCategory);
+
+      let botText = data.bot as string;
+      const botMsg: Msg = { 
+        role: "bot", 
+        text: botText, 
+        cta: data.cta || null,
+        recommendations: data.recommendations || []
+      };
+
+      setMessages(m => [...m, botMsg]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      const errorMsg: Msg = {
+        role: "bot",
+        text: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment."
+      };
+      setMessages(m => [...m, errorMsg]);
+    } finally {
+      setLoading(false);
+    }
+  }, [loading, lastCategory]);
+
+  const handleQuick = useCallback((q: string) => {
+    if (q === "Start Consultation") return send("start");
+    if (/Back Pain/i.test(q)) return send("symptom: back pain");
+    if (/Neck Pain/i.test(q)) return send("symptom: neck stiffness");
+    if (/Knee Pain/i.test(q)) return send("symptom: knee pain when walking");
+    if (/Shoulder Pain/i.test(q)) return send("symptom: shoulder pain when lifting");
+    if (/Posture/i.test(q)) return send("symptom: pain from sitting too long");
+    return send(q);
+  }, [send]);
 
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-50">
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsOpen(!isOpen)}
-          className="bg-primary text-primary-foreground rounded-full p-4 shadow-lg"
-        >
-          {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
-        </motion.button>
-      </div>
+      {/* Floating bubble */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => setOpen(v => !v)}
+        className="fixed z-50 bottom-6 right-6 rounded-full p-4 shadow-lg bg-primary text-primary-foreground hover:opacity-90 transition"
+        aria-label="Open physiotherapy assistant"
+      >
+        {open ? <X size={24} /> : <MessageCircle size={24} />}
+      </motion.button>
 
+      {/* Panel */}
       <AnimatePresence>
-        {isOpen && (
+        {open && (
           <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            className="fixed bottom-20 right-6 w-full max-w-sm h-[70vh] bg-card border border-border rounded-lg shadow-xl flex flex-col z-50"
+            className="fixed bottom-20 right-6 w-[340px] md:w-[380px] h-[520px] z-50 rounded-2xl shadow-2xl bg-card border border-border flex flex-col"
           >
-            <header className="p-4 border-b border-border flex items-center">
-              <Bot className="text-primary mr-2" />
-              <h2 className="font-bold text-lg text-card-foreground">PhysioBot Assistant</h2>
-            </header>
-
-            <div className="flex-1 p-4 overflow-y-auto space-y-4">
-              {messages.map((message, index) => {
-                return (
-                    <div key={index} className={`flex items-start gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
-                      {message.role === 'model' && <Bot className="text-primary flex-shrink-0" />}
-                      
-                      <div className={`rounded-lg p-3 max-w-xs ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                          {message.content.map(renderContentPart)}
-                      </div>
-
-                      {message.role === 'user' && <User className="text-primary flex-shrink-0" />}
-                    </div>
-                )
-              })}
-               {loading && (
-                    <div className="flex items-start gap-3">
-                        <Bot className="text-primary flex-shrink-0" />
-                        <div className="rounded-lg p-3 bg-muted text-muted-foreground">
-                            <Loader2 className="animate-spin h-5 w-5" />
-                        </div>
-                    </div>
-                )}
-              <div ref={messagesEndRef} />
+            <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+              <div className="font-semibold flex items-center gap-2">
+                <Bot className="text-primary" size={20} />
+                Physiotherapy Assistant
+              </div>
+              <button 
+                onClick={() => setOpen(false)} 
+                className="opacity-70 hover:opacity-100 p-1"
+              >
+                <X size={16} />
+              </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-4 border-t border-border flex items-center">
+            {/* Messages */}
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3 text-sm">
+              {messages.map((m, i) => (
+                <MessageComponent key={i} message={m} index={i} />
+              ))}
+
+              {loading && (
+                <div className="flex gap-2 justify-start">
+                  <Bot className="text-primary flex-shrink-0 mt-1" size={16} />
+                  <div className="rounded-lg px-3 py-2 bg-muted text-muted-foreground">
+                    <Loader2 className="animate-spin h-4 w-4" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Quick buttons */}
+            <div className="px-3 pb-2 flex gap-1 flex-wrap">
+              {QUICK.map(q => (
+                <button
+                  key={q}
+                  onClick={() => handleQuick(q)}
+                  disabled={loading}
+                  className="text-xs rounded-full px-2 py-1 bg-secondary hover:bg-secondary/80 disabled:opacity-50 transition"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+
+            {/* Input */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const t = input;
+                setInput("");
+                send(t);
+              }}
+              className="p-3 border-t border-border flex gap-2"
+            >
               <input
-                type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your symptoms..."
-                className="flex-1 bg-transparent focus:outline-none text-sm text-card-foreground"
+                placeholder="Type here… (e.g., knee pain when walking)"
                 disabled={loading}
+                className="flex-1 rounded-lg px-3 py-2 bg-background border border-border text-sm disabled:opacity-50"
               />
-              <Button type="submit" size="icon" variant="ghost" disabled={loading || !input.trim()}>
-                <Send size={20} />
-              </Button>
+              <button 
+                type="submit"
+                disabled={loading || !input.trim()}
+                className="rounded-lg px-3 py-2 bg-primary text-primary-foreground text-sm disabled:opacity-50 hover:opacity-90 transition"
+              >
+                <Send size={16} />
+              </button>
             </form>
           </motion.div>
         )}

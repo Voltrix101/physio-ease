@@ -2,7 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Critical CSS - loaded first for fastest render */
 @layer base {
+  /* Optimize font rendering */
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Prevent layout shifts */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  /* Optimize images for performance */
+  img {
+    height: auto;
+    max-width: 100%;
+  }
+
   :root {
     --background: 240 50% 98%; /* #fafafa */
     --foreground: 240 10% 3.9%; /* #222222 */
