@@ -3,12 +3,12 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { useEffect, Suspense } from 'react';
+import { useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { DashboardClient } from '@/components/dashboard/DashboardClient';
 import { Loader2 } from 'lucide-react';
 
-function DashboardPageContent() {
+export default function DashboardPage() {
   const { user, loading: authLoading, isAdmin } = useAuth();
   const router = useRouter();
 
@@ -32,16 +32,4 @@ function DashboardPageContent() {
       <DashboardClient />
     </div>
   );
-}
-
-export default function DashboardPage() {
-    return (
-        <Suspense fallback={
-            <div className="flex h-screen w-full items-center justify-center bg-background">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        }>
-            <DashboardPageContent />
-        </Suspense>
-    );
 }

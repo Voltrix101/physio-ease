@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Stethoscope, LogOut, Menu, Bell, UserCircle } from 'lucide-react';
+import { Stethoscope, LogOut, Menu, Bell } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
@@ -12,6 +12,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { ThemeToggle } from './ThemeToggle';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { cn } from '@/lib/utils';
+import { NavLinks } from './NavLinks';
 
 
 export function Header() {
@@ -32,21 +34,11 @@ export function Header() {
     }
   };
 
-  const NavLinks = ({ inSheet }: { inSheet?: boolean }) => (
-    <>
-      <Link href="/" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>Home</Link>
-      <Link href="/services" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>Services</Link>
-      <Link href="/about" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>About</Link>
-      <Link href="/products" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>Products</Link>
-      <Link href="/videos" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>Videos</Link>
-      {user && isAdmin && (
-        <Link href="/dashboard" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>Dashboard</Link>
-      )}
-    </>
-  );
-
   return (
-    <header className="sticky top-0 z-50 w-full bg-deep-highlight text-deep-highlight-foreground px-6 py-4 flex justify-between items-center shadow-md animate-slideDown">
+    <header className={cn(
+        "sticky top-0 z-50 w-full px-6 py-4 flex justify-between items-center shadow-md animate-slideDown",
+        "bg-deep-highlight/95 dark:bg-card/60 text-deep-highlight-foreground dark:text-foreground backdrop-blur-sm"
+        )}>
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           <Stethoscope className="h-6 w-6 text-accent" />
           <span className="font-headline text-2xl tracking-wide">Pain Manage Clinic</span>
@@ -67,7 +59,7 @@ export function Header() {
                     <SheetTitle className="text-foreground dark:text-deep-highlight-foreground font-headline text-2xl tracking-wide text-left">Menu</SheetTitle>
                   </SheetHeader>
                   <nav className="flex flex-col gap-6 text-lg mt-8">
-                    <SheetClose asChild><NavLinks inSheet={true} /></SheetClose>
+                    <SheetClose asChild><NavLinks inSheet={true} user={user} isAdmin={isAdmin} /></SheetClose>
                     <Button onClick={handleBookAppointmentClick} variant="accent" className="mt-4 rounded-full bg-gradient-to-r from-[#ffb84d] to-[#ff9933] text-white hover:scale-105 transition-all">
                       Book Appointment
                     </Button>
@@ -83,7 +75,7 @@ export function Header() {
         ) : (
           <>
             <nav className="hidden md:flex items-center gap-6 text-sm">
-              <NavLinks />
+              <NavLinks user={user} isAdmin={isAdmin} />
             </nav>
             <div className="flex items-center gap-4">
                 <Button onClick={handleBookAppointmentClick} variant="accent" className="rounded-full bg-gradient-to-r from-[#ffb84d] to-[#ff9933] text-white hover:scale-105 transition-all">
