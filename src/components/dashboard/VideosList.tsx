@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -12,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import Link from 'next/link';
+import { Badge } from '../ui/badge';
 
 
 export function VideosList() {
@@ -22,7 +24,7 @@ export function VideosList() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const q = query(collection(db, "videos"), orderBy("title"));
+    const q = query(collection(db, "videos"), orderBy("category"), orderBy("title"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const videosData = querySnapshot.docs.map(doc => ({
             id: doc.id,
@@ -113,6 +115,7 @@ export function VideosList() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Title</TableHead>
+                  <TableHead>Category</TableHead>
                   <TableHead>YouTube ID</TableHead>
                   <TableHead>Link</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -122,6 +125,9 @@ export function VideosList() {
                 {videos.map((video) => (
                   <TableRow key={video.id}>
                     <TableCell className="font-medium">{video.title}</TableCell>
+                    <TableCell>
+                        {video.category && <Badge variant="secondary">{video.category}</Badge>}
+                    </TableCell>
                     <TableCell>{video.youtubeId}</TableCell>
                     <TableCell>
                         <Link href={`https://youtu.be/${video.youtubeId}`} target="_blank" className="text-primary hover:underline flex items-center gap-1">

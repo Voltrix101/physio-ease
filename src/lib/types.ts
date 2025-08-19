@@ -28,6 +28,7 @@ export interface Video {
     title: string;
     description: string;
     youtubeId: string;
+    category?: string;
 }
 
 export type AppointmentStatus = 'pending' | 'confirmed' | 'rejected' | 'completed';

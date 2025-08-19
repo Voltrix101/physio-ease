@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -15,6 +16,7 @@ const videoSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   youtubeId: z.string().min(5, 'Must be a valid YouTube Video ID'),
+  category: z.string().optional(),
 });
 
 type VideoFormData = z.infer<typeof videoSchema>;
@@ -40,6 +42,7 @@ export function VideoDialog({ isOpen, setIsOpen, onSave, video }: VideoDialogPro
             title: '',
             description: '',
             youtubeId: '',
+            category: '',
           });
         }
     }
@@ -63,6 +66,11 @@ export function VideoDialog({ isOpen, setIsOpen, onSave, video }: VideoDialogPro
             <Label htmlFor="title">Title</Label>
             <Input id="title" {...register('title')} />
             {errors.title && <p className="text-red-500 text-xs">{errors.title.message}</p>}
+          </div>
+           <div className="grid gap-2">
+            <Label htmlFor="category">Category</Label>
+            <Input id="category" {...register('category')} placeholder="e.g. Back Pain Relief" />
+            {errors.category && <p className="text-red-500 text-xs">{errors.category.message}</p>}
           </div>
           <div className="grid gap-2">
             <Label htmlFor="description">Description</Label>
