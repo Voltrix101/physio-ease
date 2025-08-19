@@ -32,19 +32,19 @@ export function Header() {
 
   const NavLinks = ({ inSheet }: { inSheet?: boolean }) => (
     <>
-      <Link href="/" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>Home</Link>
-      <Link href="/services" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>Services</Link>
-      <Link href="/about" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>About</Link>
-      <Link href="/products" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>Products</Link>
-      <Link href="/videos" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>Videos</Link>
+      <Link href="/" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>Home</Link>
+      <Link href="/services" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>Services</Link>
+      <Link href="/about" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>About</Link>
+      <Link href="/products" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>Products</Link>
+      <Link href="/videos" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>Videos</Link>
       {user && isAdmin && (
-        <Link href="/dashboard" className={`${inSheet ? 'w-full' : 'text-foreground/80 hover:text-accent transition-colors'}`}>Dashboard</Link>
+        <Link href="/dashboard" className={`${inSheet ? 'w-full text-foreground dark:text-deep-highlight-foreground' : 'text-deep-highlight-foreground hover:text-accent transition-colors'}`}>Dashboard</Link>
       )}
     </>
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-card/80 dark:bg-[#121212]/80 text-foreground backdrop-blur-sm px-6 py-4 flex justify-between items-center shadow-md dark:shadow-black/20 animate-slideDown">
+    <header className="sticky top-0 z-50 w-full bg-deep-highlight text-deep-highlight-foreground px-6 py-4 flex justify-between items-center shadow-md animate-slideDown">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           <Stethoscope className="h-6 w-6 text-accent" />
           <span className="font-headline text-2xl tracking-wide">Pain Manage Clinic</span>
@@ -62,7 +62,7 @@ export function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="bg-card dark:bg-[#121212] text-foreground border-l">
                   <SheetHeader>
-                    <SheetTitle className="text-foreground font-headline text-2xl tracking-wide text-left">Menu</SheetTitle>
+                    <SheetTitle className="text-foreground dark:text-deep-highlight-foreground font-headline text-2xl tracking-wide text-left">Menu</SheetTitle>
                   </SheetHeader>
                   <nav className="flex flex-col gap-6 text-lg mt-8">
                     <SheetClose asChild><NavLinks inSheet={true} /></SheetClose>
@@ -70,7 +70,7 @@ export function Header() {
                       Book Appointment
                     </Button>
                      {user && (
-                      <Button variant="ghost" onClick={handleLogout} className="justify-start gap-2 text-lg">
+                      <Button variant="ghost" onClick={handleLogout} className="justify-start gap-2 text-lg text-foreground dark:text-deep-highlight-foreground">
                           <LogOut className="h-5 w-5" /> Logout
                       </Button>
                     )}

@@ -23,7 +23,7 @@ export default async function ProductsPage() {
             <main className="flex-1">
                 <section className="bg-secondary/50 py-12 md:py-20 animate-fadeUp">
                     <div className="container px-4 md:px-6 text-center">
-                        <h1 className="text-3xl sm:text-4xl font-headline tracking-tight text-deep-highlight md:text-5xl">
+                        <h1 className="text-3xl sm:text-4xl font-headline tracking-tight text-primary md:text-5xl">
                             Recommended Products
                         </h1>
                         <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">

@@ -113,7 +113,7 @@ export default async function Home() {
         </section>
 
       </main>
-      <footer className="bg-deep-highlight dark:bg-card text-deep-highlight-foreground dark:text-primary-foreground py-6 border-t border-deep-highlight/50 dark:border-border">
+      <footer className="bg-deep-highlight text-deep-highlight-foreground py-6 border-t border-deep-highlight/50">
         <div className="container text-center text-sm px-4 md:px-6">
           © {new Date().getFullYear()} PhysioEase Clinic. All rights reserved.
         </div>

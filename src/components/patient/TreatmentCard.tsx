@@ -12,7 +12,7 @@ interface TreatmentCardProps {
 export function TreatmentCard({ treatment }: TreatmentCardProps) {
   return (
     <div className="bg-card rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full overflow-hidden">
-      <div className="relative h-48 w-full overflow-hidden">
+      <div className="relative h-48 w-full overflow-hidden group">
         <Image
           src={treatment.imageUrl}
           alt={treatment.name}

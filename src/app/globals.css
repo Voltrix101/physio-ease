@@ -81,8 +81,6 @@
 @layer base {
   * {
     @apply border-border;
-    scrollbar-width: thin;
-    scrollbar-color: #ffb84d var(--scrollbar-track);
   }
   html {
     scroll-behavior: smooth;
@@ -96,10 +94,14 @@
     @apply font-headline;
   }
   .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
-    @apply text-primary-foreground;
+    @apply text-foreground;
   }
    h1, h2, h3, h4, h5, h6 {
     @apply text-foreground;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #ffb84d var(--scrollbar-track);
   }
 }
 
