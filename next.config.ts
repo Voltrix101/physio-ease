@@ -2,12 +2,6 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  experimental: {
-    // This is required to allow the Next.js dev server to accept requests from the Studio editor.
-    allowedDevOrigins: [
-      '*.cluster-zumahodzirciuujpqvsniawo3o.cloudworkstations.dev',
-    ],
-  },
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
